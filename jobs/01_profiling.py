@@ -40,106 +40,18 @@ Cách chạy (từ thư mục gốc project, sau khi `docker compose up -d`):
 """
 
 import json
-import logging
 import os
-import sys
-import time
 from datetime import datetime
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
-from olist_tables import FOREIGN_KEYS, RAW_DIR, REPORT_DIR, TABLES
+from common import (Timer, fmt, md_cell, normalize_text, read_raw_csv, setup_logger,
+                    wait_for_executors)
+from olist_tables import FOREIGN_KEYS, REPORT_DIR, TABLES
 
 OUT_DIR = os.path.join(REPORT_DIR, "profiling")
-BOM = "﻿"  # Ký tự ẩn "Byte Order Mark" mà Excel/Windows hay chèn vào đầu file
-
-# Ký tự có dấu tiếng Bồ Đào Nha -> không dấu (dùng cho kiểm tra tên thành phố)
-ACCENTED = "áàâãäéèêëíìîïóòôõöúùûüç"
-PLAIN = "aaaaaeeeeiiiiooooouuuuc"
-
-
-# =============================================================================
-# Tiện ích: log ra màn hình + file, và đo thời gian
-# =============================================================================
-def setup_logger():
-    os.makedirs(OUT_DIR, exist_ok=True)
-    logger = logging.getLogger("profiling")
-    logger.setLevel(logging.INFO)
-    fmt = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s", "%Y-%m-%d %H:%M:%S")
-    for handler in (logging.StreamHandler(sys.stdout),
-                    logging.FileHandler(os.path.join(OUT_DIR, "profiling_run.log"), mode="w",
-                                        encoding="utf-8")):
-        handler.setFormatter(fmt)
-        logger.addHandler(handler)
-    return logger
-
-
-log = setup_logger()
-
-
-class Timer:
-    """Dùng với `with Timer() as t:` rồi đọc t.seconds - giống console.time() trong JS."""
-
-    def __enter__(self):
-        self.start = time.perf_counter()
-        return self
-
-    def __exit__(self, *exc):
-        self.seconds = round(time.perf_counter() - self.start, 2)
-
-
-# =============================================================================
-# 1. Đọc dữ liệu thô
-# =============================================================================
-def wait_for_executors(sc, timeout=60):
-    """
-    Chờ các worker cấp executor cho job. Ngay sau khi tạo SparkSession, executor
-    có thể chưa kịp đăng ký; nếu đọc dữ liệu luôn thì Spark tưởng cụm chỉ có ít
-    core và chia dữ liệu thành ít partition hơn.
-    """
-    count = 0
-    deadline = time.time() + timeout
-    while time.time() < deadline:
-        count = sc._jsc.sc().getExecutorMemoryStatus().size() - 1  # trừ driver
-        if count > 0:
-            time.sleep(3)  # chờ thêm chút cho các executor còn lại
-            return sc._jsc.sc().getExecutorMemoryStatus().size() - 1
-        time.sleep(1)
-    return count
-
-
-def read_raw_csv(spark, file_name, multiline=False):
-    """
-    Đọc 1 file CSV thành DataFrame, GIỮ NGUYÊN mọi cột ở dạng chuỗi (string).
-
-    Vì sao không để Spark tự đoán kiểu (inferSchema)? Vì ta đang khảo sát dữ liệu
-    THÔ: nếu Spark tự ép kiểu, giá trị sai định dạng sẽ âm thầm biến thành NULL
-    và ta không biết được dữ liệu gốc sai ở đâu.
-
-    Về multiLine: bình thường Spark cắt 1 file CSV lớn thành nhiều mảnh (partition)
-    theo vị trí byte, để nhiều executor đọc song song. Nhưng nếu một giá trị chứa
-    dấu xuống dòng thì không cắt bừa được (có thể cắt giữa một bản ghi), nên ở chế
-    độ multiLine Spark buộc phải đọc CẢ FILE bằng 1 task duy nhất. Vì vậy chỉ bật
-    multiLine cho bảng thật sự cần (reviews).
-    """
-    path = os.path.join(RAW_DIR, file_name)
-    df = (spark.read
-          .option("header", True)          # Dòng đầu là tên cột
-          .option("multiLine", multiline)
-          .option("quote", '"')
-          .option("escape", '"')           # Trong CSV chuẩn, dấu " bên trong chuỗi được viết là ""
-          .option("encoding", "UTF-8")
-          .csv(path))
-
-    # Phát hiện & sửa BOM trong tên cột (nếu không sửa, join theo tên cột sẽ lỗi)
-    issues = []
-    for col in df.columns:
-        if col.startswith(BOM):
-            issues.append("Tên cột '{}' bắt đầu bằng ký tự BOM (U+FEFF) - đã bỏ BOM khi đọc"
-                          .format(col.lstrip(BOM)))
-            df = df.withColumnRenamed(col, col.lstrip(BOM))
-    return df, path, issues
+log = setup_logger("profiling", os.path.join(OUT_DIR, "profiling_run.log"))
 
 
 # =============================================================================
@@ -243,17 +155,17 @@ def extra_checks(name, df):
         extras["Nhiều nhất số dòng toạ độ / mã zip"] = z["max"]
 
         # Cùng 1 zip nhưng tên thành phố viết khác nhau (vd: "são paulo" vs "sao paulo")
-        normalized = F.lower(F.trim(F.translate("geolocation_city", ACCENTED, PLAIN)))
+        normalized = normalize_text(F.col("geolocation_city"))
         city = (df.groupBy("geolocation_zip_code_prefix")
                 .agg(F.countDistinct("geolocation_city").alias("raw"),
                      F.countDistinct(normalized).alias("norm")))
         c = city.agg(F.sum(F.when(F.col("raw") > 1, 1).otherwise(0)).alias("raw"),
                      F.sum(F.when(F.col("norm") > 1, 1).otherwise(0)).alias("norm")).collect()[0]
         extras["Mã zip có >1 cách viết tên thành phố (dữ liệu gốc)"] = c["raw"]
-        extras["Mã zip có >1 cách viết tên thành phố (sau khi bỏ dấu + chữ thường)"] = c["norm"]
+        extras["Mã zip có >1 cách viết tên thành phố (sau khi chuẩn hoá)"] = c["norm"]
         extras["Số cách viết khác nhau của tên thành phố gốc"] = (
             df.select("geolocation_city").distinct().count())
-        extras["Số tên thành phố sau khi bỏ dấu + chữ thường"] = (
+        extras["Số tên thành phố sau khi chuẩn hoá"] = (
             df.select(normalized.alias("c")).distinct().count())
 
     if name == "reviews":
@@ -303,18 +215,6 @@ def check_foreign_keys(frames):
 # =============================================================================
 # 5. Xuất báo cáo Markdown
 # =============================================================================
-def md_cell(value, max_len=40):
-    """Làm sạch giá trị để nhét vào ô bảng Markdown."""
-    if value is None:
-        return "*NULL*"
-    s = str(value).replace("\n", " ").replace("\r", " ").replace("|", "\\|")
-    return s if len(s) <= max_len else s[:max_len - 1] + "…"
-
-
-def fmt(n):
-    return "{:,}".format(n) if isinstance(n, int) else str(n)
-
-
 def write_markdown(summary, path):
     run = summary["run"]
     L = []

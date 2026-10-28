@@ -1,15 +1,15 @@
 {
   "run": {
-    "started_at": "2026-10-28 02:51:12",
+    "started_at": "2026-10-28 03:04:05",
     "spark_version": "3.5.3",
     "master": "spark://spark-master:7077",
     "executors": 2,
     "default_parallelism": 4,
     "total_size_mb": 120.35,
     "total_rows": 1550922,
-    "tables_seconds": 31.06,
-    "fk_seconds": 6.35,
-    "total_seconds": 43.77
+    "tables_seconds": 35.23,
+    "fk_seconds": 7.45,
+    "total_seconds": 49.16
   },
   "issues": [],
   "tables": {
@@ -196,7 +196,7 @@
       "file": "olist_orders_dataset.csv",
       "size_mb": 16.84,
       "partitions": 4,
-      "seconds": 11.72
+      "seconds": 12.9
     },
     "order_items": {
       "rows": 112650,
@@ -316,7 +316,7 @@
       "file": "olist_order_items_dataset.csv",
       "size_mb": 14.72,
       "partitions": 4,
-      "seconds": 3.14
+      "seconds": 3.49
     },
     "payments": {
       "rows": 103886,
@@ -443,7 +443,7 @@
       "file": "olist_order_payments_dataset.csv",
       "size_mb": 5.51,
       "partitions": 2,
-      "seconds": 2.44
+      "seconds": 2.92
     },
     "reviews": {
       "rows": 99224,
@@ -591,7 +591,7 @@
       "file": "olist_order_reviews_dataset.csv",
       "size_mb": 13.78,
       "partitions": 1,
-      "seconds": 3.01
+      "seconds": 3.05
     },
     "customers": {
       "rows": 99441,
@@ -754,7 +754,7 @@
       "file": "olist_customers_dataset.csv",
       "size_mb": 8.62,
       "partitions": 3,
-      "seconds": 1.93
+      "seconds": 1.89
     },
     "sellers": {
       "rows": 3095,
@@ -905,7 +905,7 @@
       "file": "olist_sellers_dataset.csv",
       "size_mb": 0.17,
       "partitions": 1,
-      "seconds": 0.93
+      "seconds": 0.92
     },
     "products": {
       "rows": 32951,
@@ -1041,7 +1041,7 @@
       "file": "olist_products_dataset.csv",
       "size_mb": 2.27,
       "partitions": 1,
-      "seconds": 1.41
+      "seconds": 1.64
     },
     "geolocation": {
       "rows": 1000163,
@@ -1209,14 +1209,14 @@
         "Trung bình số dòng toạ độ / mã zip": 52.6,
         "Nhiều nhất số dòng toạ độ / mã zip": 1146,
         "Mã zip có >1 cách viết tên thành phố (dữ liệu gốc)": 8556,
-        "Mã zip có >1 cách viết tên thành phố (sau khi bỏ dấu + chữ thường)": 550,
+        "Mã zip có >1 cách viết tên thành phố (sau khi chuẩn hoá)": 547,
         "Số cách viết khác nhau của tên thành phố gốc": 8011,
-        "Số tên thành phố sau khi bỏ dấu + chữ thường": 5968
+        "Số tên thành phố sau khi chuẩn hoá": 5964
       },
       "file": "olist_geolocation_dataset.csv",
       "size_mb": 58.44,
       "partitions": 4,
-      "seconds": 5.68
+      "seconds": 7.71
     },
     "category_translation": {
       "rows": 71,
@@ -1262,7 +1262,7 @@
       "file": "product_category_name_translation.csv",
       "size_mb": 0.0,
       "partitions": 1,
-      "seconds": 0.67
+      "seconds": 0.57
     }
   },
   "foreign_keys": [
@@ -1272,7 +1272,7 @@
       "orphan_rows": 0,
       "orphan_pct": 0.0,
       "orphan_distinct_values": 0,
-      "seconds": 1.05
+      "seconds": 1.07
     },
     {
       "check": "Dòng hàng trỏ tới đơn hàng không tồn tại",
@@ -1280,7 +1280,7 @@
       "orphan_rows": 0,
       "orphan_pct": 0.0,
       "orphan_distinct_values": 0,
-      "seconds": 0.9
+      "seconds": 1.07
     },
     {
       "check": "Dòng hàng trỏ tới sản phẩm không tồn tại",
@@ -1288,7 +1288,7 @@
       "orphan_rows": 0,
       "orphan_pct": 0.0,
       "orphan_distinct_values": 0,
-      "seconds": 0.47
+      "seconds": 0.49
     },
     {
       "check": "Dòng hàng trỏ tới người bán không tồn tại",
@@ -1296,7 +1296,7 @@
       "orphan_rows": 0,
       "orphan_pct": 0.0,
       "orphan_distinct_values": 0,
-      "seconds": 0.44
+      "seconds": 0.41
     },
     {
       "check": "Thanh toán trỏ tới đơn hàng không tồn tại",
@@ -1304,7 +1304,7 @@
       "orphan_rows": 0,
       "orphan_pct": 0.0,
       "orphan_distinct_values": 0,
-      "seconds": 0.69
+      "seconds": 0.79
     },
     {
       "check": "Review trỏ tới đơn hàng không tồn tại",
@@ -1312,7 +1312,7 @@
       "orphan_rows": 0,
       "orphan_pct": 0.0,
       "orphan_distinct_values": 0,
-      "seconds": 0.57
+      "seconds": 0.66
     },
     {
       "check": "Đơn hàng không có dòng sản phẩm nào",
@@ -1320,7 +1320,7 @@
       "orphan_rows": 775,
       "orphan_pct": 0.78,
       "orphan_distinct_values": 775,
-      "seconds": 0.6
+      "seconds": 0.71
     },
     {
       "check": "Đơn hàng không có thông tin thanh toán",
@@ -1328,7 +1328,7 @@
       "orphan_rows": 1,
       "orphan_pct": 0.0,
       "orphan_distinct_values": 1,
-      "seconds": 0.58
+      "seconds": 0.87
     },
     {
       "check": "Sản phẩm có danh mục chưa có bản dịch tiếng Anh",
@@ -1336,7 +1336,7 @@
       "orphan_rows": 13,
       "orphan_pct": 0.04,
       "orphan_distinct_values": 2,
-      "seconds": 0.27
+      "seconds": 0.34
     },
     {
       "check": "Khách hàng có mã zip không có trong bảng toạ độ",
@@ -1344,7 +1344,7 @@
       "orphan_rows": 278,
       "orphan_pct": 0.28,
       "orphan_distinct_values": 157,
-      "seconds": 0.42
+      "seconds": 0.62
     },
     {
       "check": "Người bán có mã zip không có trong bảng toạ độ",
@@ -1352,7 +1352,7 @@
       "orphan_rows": 7,
       "orphan_pct": 0.23,
       "orphan_distinct_values": 7,
-      "seconds": 0.36
+      "seconds": 0.42
     }
   ]
 }

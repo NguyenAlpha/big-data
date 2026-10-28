@@ -77,7 +77,7 @@ mất khoảng **45-55 giây**.
 |---|---|---|---|---|
 | 1 | geolocation | Dòng trùng hoàn toàn | **261.831 dòng (26%)** | Loại trùng |
 | 2 | geolocation | Một mã zip có nhiều dòng toạ độ | 19.015 zip, trung bình **52,6 dòng/zip**, tối đa 1.146 | Gộp còn 1 dòng/zip (lấy toạ độ trung bình), giảm từ 1 triệu xuống khoảng 19 nghìn dòng |
-| 3 | geolocation | Tên thành phố viết không thống nhất (`são paulo` / `sao paulo`) | 8.556 zip có hơn 1 cách viết; **chỉ còn 550** sau khi bỏ dấu và chuyển chữ thường. 8.011 cách viết thu về 5.968 tên. | Chuẩn hoá: bỏ dấu, chữ thường, trim |
+| 3 | geolocation | Tên thành phố viết không thống nhất (`são paulo` / `sao paulo`) | 8.556 zip có hơn 1 cách viết; **chỉ còn 547** sau khi chuẩn hoá (chữ thường, bỏ dấu, bỏ ký tự rác). 8.011 cách viết thu về 5.964 tên. Ngoài ra còn vài chục tên lỗi như `florian&oacute;polis`, `sa£o paulo`, `´teresopolis`. | Chuẩn hoá bằng `normalize_text()` trong `jobs/common.py`, rồi lấy tên phổ biến nhất của mỗi zip |
 | 4 | geolocation | Toạ độ nằm ngoài Brazil | 42 dòng | Loại bỏ trước khi tính trung bình |
 | 5 | reviews | `review_id` bị trùng | **814 dòng**: 789 `review_id`, mỗi id gắn với 2 đơn trở lên. Cặp (`review_id`, `order_id`) thì không trùng. | Dùng khoá ghép (`review_id`, `order_id`) |
 | 6 | reviews | Một đơn có nhiều review | 547 đơn | Giữ review mới nhất cho mỗi đơn khi join |

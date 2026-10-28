@@ -6,30 +6,30 @@
 
 | Thuộc tính | Giá trị |
 |---|---|
-| Thời điểm chạy | 2026-10-28 02:51:12 |
+| Thời điểm chạy | 2026-10-28 03:04:05 |
 | Phiên bản Spark | 3.5.3 |
 | Spark master | spark://spark-master:7077 |
 | Số executor | 2 |
 | Số core xử lý song song (defaultParallelism) | 4 |
 | Tổng dung lượng dữ liệu gốc | 120.35 MB |
 | Tổng số bản ghi | 1,550,922 |
-| Thời gian profiling 9 bảng | 31.06 s |
-| Thời gian kiểm tra khoá ngoại | 6.35 s |
-| Tổng thời gian chạy job | 43.77 s |
+| Thời gian profiling 9 bảng | 35.23 s |
+| Thời gian kiểm tra khoá ngoại | 7.45 s |
+| Tổng thời gian chạy job | 49.16 s |
 
 ## 2. Tổng quan các bảng
 
 | Bảng | File | Dung lượng (MB) | Số dòng | Số cột | Partition | Dòng trùng hoàn toàn | Trùng khoá chính | Thời gian (s) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| orders | `olist_orders_dataset.csv` | 16.84 | 99,441 | 8 | 4 | 0 | 0 | 11.72 |
-| order_items | `olist_order_items_dataset.csv` | 14.72 | 112,650 | 7 | 4 | 0 | 0 | 3.14 |
-| payments | `olist_order_payments_dataset.csv` | 5.51 | 103,886 | 5 | 2 | 0 | 0 | 2.44 |
-| reviews | `olist_order_reviews_dataset.csv` | 13.78 | 99,224 | 7 | 1 | 0 | 814 | 3.01 |
-| customers | `olist_customers_dataset.csv` | 8.62 | 99,441 | 5 | 3 | 0 | 0 | 1.93 |
-| sellers | `olist_sellers_dataset.csv` | 0.17 | 3,095 | 4 | 1 | 0 | 0 | 0.93 |
-| products | `olist_products_dataset.csv` | 2.27 | 32,951 | 9 | 1 | 0 | 0 | 1.41 |
-| geolocation | `olist_geolocation_dataset.csv` | 58.44 | 1,000,163 | 5 | 4 | 261,831 | - | 5.68 |
-| category_translation | `product_category_name_translation.csv` | 0.0 | 71 | 2 | 1 | 0 | 0 | 0.67 |
+| orders | `olist_orders_dataset.csv` | 16.84 | 99,441 | 8 | 4 | 0 | 0 | 12.9 |
+| order_items | `olist_order_items_dataset.csv` | 14.72 | 112,650 | 7 | 4 | 0 | 0 | 3.49 |
+| payments | `olist_order_payments_dataset.csv` | 5.51 | 103,886 | 5 | 2 | 0 | 0 | 2.92 |
+| reviews | `olist_order_reviews_dataset.csv` | 13.78 | 99,224 | 7 | 1 | 0 | 814 | 3.05 |
+| customers | `olist_customers_dataset.csv` | 8.62 | 99,441 | 5 | 3 | 0 | 0 | 1.89 |
+| sellers | `olist_sellers_dataset.csv` | 0.17 | 3,095 | 4 | 1 | 0 | 0 | 0.92 |
+| products | `olist_products_dataset.csv` | 2.27 | 32,951 | 9 | 1 | 0 | 0 | 1.64 |
+| geolocation | `olist_geolocation_dataset.csv` | 58.44 | 1,000,163 | 5 | 4 | 261,831 | - | 7.71 |
+| category_translation | `product_category_name_translation.csv` | 0.0 | 71 | 2 | 1 | 0 | 0 | 0.57 |
 
 ## 3. Vấn đề phát hiện khi đọc file
 
@@ -368,9 +368,9 @@ Khoá chính: `(không có khoá duy nhất)`
 | Trung bình số dòng toạ độ / mã zip | 52.6 |
 | Nhiều nhất số dòng toạ độ / mã zip | 1,146 |
 | Mã zip có >1 cách viết tên thành phố (dữ liệu gốc) | 8,556 |
-| Mã zip có >1 cách viết tên thành phố (sau khi bỏ dấu + chữ thường) | 550 |
+| Mã zip có >1 cách viết tên thành phố (sau khi chuẩn hoá) | 547 |
 | Số cách viết khác nhau của tên thành phố gốc | 8,011 |
-| Số tên thành phố sau khi bỏ dấu + chữ thường | 5,968 |
+| Số tên thành phố sau khi chuẩn hoá | 5,964 |
 
 **Phân bố giá trị `geolocation_state`** (top 15)
 

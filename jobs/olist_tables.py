@@ -20,6 +20,10 @@ try_cast trả về NULL khi không ép kiểu được thay vì làm job bị l
 # Đường dẫn bên trong container (xem phần volumes trong docker-compose.yml)
 RAW_DIR = "/data/raw"
 REPORT_DIR = "/opt/reports"
+# Data lake theo kiến trúc "medallion": raw (bronze) -> silver (đã làm sạch) -> gold (tổng hợp)
+LAKE_DIR = "/data/lake"
+SILVER_DIR = LAKE_DIR + "/silver"
+GOLD_DIR = LAKE_DIR + "/gold"
 
 # Khung toạ độ (bounding box) của Brazil - dùng để phát hiện toạ độ sai
 BRAZIL_LAT = (-33.75, 5.27)

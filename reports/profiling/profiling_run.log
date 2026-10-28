@@ -1,22 +1,22 @@
-2026-10-28 02:51:18 | INFO | Spark 3.5.3 | master=spark://spark-master:7077 | executors=2 | parallelism=4
-2026-10-28 02:51:33 | INFO | Bảng orders                    99,441 dòng |  8 cột | 4 partition | trùng=0 | 11.72s
-2026-10-28 02:51:36 | INFO | Bảng order_items              112,650 dòng |  7 cột | 4 partition | trùng=0 | 3.14s
-2026-10-28 02:51:38 | INFO | Bảng payments                 103,886 dòng |  5 cột | 2 partition | trùng=0 | 2.44s
-2026-10-28 02:51:41 | INFO | Bảng reviews                   99,224 dòng |  7 cột | 1 partition | trùng=0 | 3.01s
-2026-10-28 02:51:43 | INFO | Bảng customers                 99,441 dòng |  5 cột | 3 partition | trùng=0 | 1.93s
-2026-10-28 02:51:44 | INFO | Bảng sellers                    3,095 dòng |  4 cột | 1 partition | trùng=0 | 0.93s
-2026-10-28 02:51:46 | INFO | Bảng products                  32,951 dòng |  9 cột | 1 partition | trùng=0 | 1.41s
-2026-10-28 02:51:51 | INFO | Bảng geolocation            1,000,163 dòng |  5 cột | 4 partition | trùng=261831 | 5.68s
-2026-10-28 02:51:52 | INFO | Bảng category_translation          71 dòng |  2 cột | 1 partition | trùng=0 | 0.67s
-2026-10-28 02:51:53 | INFO | FK  orders.customer_id -> customers.customer_id                  mồ côi=0 (1.05s)
-2026-10-28 02:51:54 | INFO | FK  order_items.order_id -> orders.order_id                      mồ côi=0 (0.90s)
-2026-10-28 02:51:54 | INFO | FK  order_items.product_id -> products.product_id                mồ côi=0 (0.47s)
-2026-10-28 02:51:55 | INFO | FK  order_items.seller_id -> sellers.seller_id                   mồ côi=0 (0.44s)
-2026-10-28 02:51:56 | INFO | FK  payments.order_id -> orders.order_id                         mồ côi=0 (0.69s)
-2026-10-28 02:51:56 | INFO | FK  reviews.order_id -> orders.order_id                          mồ côi=0 (0.57s)
-2026-10-28 02:51:57 | INFO | FK  orders.order_id -> order_items.order_id                      mồ côi=775 (0.60s)
-2026-10-28 02:51:57 | INFO | FK  orders.order_id -> payments.order_id                         mồ côi=1 (0.58s)
-2026-10-28 02:51:58 | INFO | FK  products.product_category_name -> category_translation.product_category_name mồ côi=13 (0.27s)
-2026-10-28 02:51:58 | INFO | FK  customers.customer_zip_code_prefix -> geolocation.geolocation_zip_code_prefix mồ côi=278 (0.42s)
-2026-10-28 02:51:58 | INFO | FK  sellers.seller_zip_code_prefix -> geolocation.geolocation_zip_code_prefix mồ côi=7 (0.36s)
-2026-10-28 02:51:58 | INFO | Xong sau 43.77s. Báo cáo: reports/profiling/profiling_report.md
+2026-10-28 03:04:11 | INFO | Spark 3.5.3 | master=spark://spark-master:7077 | executors=2 | parallelism=4
+2026-10-28 03:04:24 | INFO | Bảng orders                    99,441 dòng |  8 cột | 4 partition | trùng=0 | 12.90s
+2026-10-28 03:04:27 | INFO | Bảng order_items              112,650 dòng |  7 cột | 4 partition | trùng=0 | 3.49s
+2026-10-28 03:04:30 | INFO | Bảng payments                 103,886 dòng |  5 cột | 2 partition | trùng=0 | 2.92s
+2026-10-28 03:04:34 | INFO | Bảng reviews                   99,224 dòng |  7 cột | 1 partition | trùng=0 | 3.05s
+2026-10-28 03:04:36 | INFO | Bảng customers                 99,441 dòng |  5 cột | 3 partition | trùng=0 | 1.89s
+2026-10-28 03:04:37 | INFO | Bảng sellers                    3,095 dòng |  4 cột | 1 partition | trùng=0 | 0.92s
+2026-10-28 03:04:39 | INFO | Bảng products                  32,951 dòng |  9 cột | 1 partition | trùng=0 | 1.64s
+2026-10-28 03:04:47 | INFO | Bảng geolocation            1,000,163 dòng |  5 cột | 4 partition | trùng=261831 | 7.71s
+2026-10-28 03:04:47 | INFO | Bảng category_translation          71 dòng |  2 cột | 1 partition | trùng=0 | 0.57s
+2026-10-28 03:04:48 | INFO | FK  orders.customer_id -> customers.customer_id                  mồ côi=0 (1.07s)
+2026-10-28 03:04:49 | INFO | FK  order_items.order_id -> orders.order_id                      mồ côi=0 (1.07s)
+2026-10-28 03:04:50 | INFO | FK  order_items.product_id -> products.product_id                mồ côi=0 (0.49s)
+2026-10-28 03:04:50 | INFO | FK  order_items.seller_id -> sellers.seller_id                   mồ côi=0 (0.41s)
+2026-10-28 03:04:51 | INFO | FK  payments.order_id -> orders.order_id                         mồ côi=0 (0.79s)
+2026-10-28 03:04:52 | INFO | FK  reviews.order_id -> orders.order_id                          mồ côi=0 (0.66s)
+2026-10-28 03:04:52 | INFO | FK  orders.order_id -> order_items.order_id                      mồ côi=775 (0.71s)
+2026-10-28 03:04:53 | INFO | FK  orders.order_id -> payments.order_id                         mồ côi=1 (0.87s)
+2026-10-28 03:04:54 | INFO | FK  products.product_category_name -> category_translation.product_category_name mồ côi=13 (0.34s)
+2026-10-28 03:04:54 | INFO | FK  customers.customer_zip_code_prefix -> geolocation.geolocation_zip_code_prefix mồ côi=278 (0.62s)
+2026-10-28 03:04:55 | INFO | FK  sellers.seller_zip_code_prefix -> geolocation.geolocation_zip_code_prefix mồ côi=7 (0.42s)
+2026-10-28 03:04:55 | INFO | Xong sau 49.16s. Báo cáo: reports/profiling/profiling_report.md
