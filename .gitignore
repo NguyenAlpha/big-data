@@ -20,3 +20,6 @@ derby.log
 Thumbs.db
 .vscode/
 .idea/
+
+# Log chi tiết từng lần chạy thực nghiệm (rất nhiều file) - số liệu đã gom vào results.csv
+reports/experiments/runs/

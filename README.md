@@ -18,7 +18,7 @@ bằng **Apache Spark (PySpark)** chạy trên cụm Spark Standalone dựng b�
 | 3 | Data profiling: khảo sát chất lượng dữ liệu **trước** xử lý | Xong | [docs/02-data-profiling.md](docs/02-data-profiling.md) |
 | 4 | Làm sạch và chuẩn hoá, lưu Parquet (silver) | Xong | [docs/03-lam-sach-du-lieu.md](docs/03-lam-sach-du-lieu.md) |
 | 5 | Kết hợp và tổng hợp bằng Spark SQL (gold) | Xong | [docs/04-ket-hop-tong-hop.md](docs/04-ket-hop-tong-hop.md) |
-| 6 | Thực nghiệm: chất lượng sau xử lý, thời gian, mở rộng quy mô | Chưa làm | |
+| 6 | Thực nghiệm: mở rộng quy mô dữ liệu (x1→x20) và số core | Xong | [docs/05-thuc-nghiem.md](docs/05-thuc-nghiem.md) |
 
 ## Cấu trúc thư mục
 
@@ -28,18 +28,22 @@ bằng **Apache Spark (PySpark)** chạy trên cụm Spark Standalone dựng b�
 ├── dataset/                  # CSV gốc của Olist (KHÔNG có trên git, xem bên dưới)
 ├── data/                     # Dữ liệu sinh ra bởi job, không có trên git
 │   ├── silver/               # Bước 4: 8 bảng Parquet đã làm sạch
-│   └── gold/                 # Bước 5: 2 bảng fact + 5 bảng tổng hợp (KPI)
+│   ├── gold/                 # Bước 5: 2 bảng fact + 5 bảng tổng hợp (KPI)
+│   └── scale/                # Bước 6: dữ liệu nhân bản x5/x10/x20 (~4,2 GB, xoá được)
 ├── jobs/
 │   ├── olist_tables.py       # "Data contract": mô tả bảng, khoá, kiểu, luật kiểm tra
 │   ├── common.py             # Hàm dùng chung: đọc CSV, chuẩn hoá chữ, log, đo thời gian
 │   ├── 01_profiling.py       # Bước 3: job profiling
 │   ├── 02_clean.py           # Bước 4: job làm sạch raw CSV -> silver Parquet
 │   ├── 03_gold.py            # Bước 5: chạy các file SQL, ghi gold, đối chiếu số liệu
+│   ├── scale_data.py         # Bước 6: nhân bản dữ liệu thô x5/x10/x20
 │   └── sql/                  # Bước 5: logic join/tổng hợp viết bằng Spark SQL
 ├── reports/
 │   ├── profiling/            # Kết quả bước 3 (báo cáo .md, số liệu .json, log)
 │   ├── cleaning/             # Kết quả bước 4 (báo cáo trước/sau, số liệu .json, log)
-│   └── gold/                 # Kết quả bước 5 (báo cáo, đối chiếu, execution plan)
+│   ├── gold/                 # Kết quả bước 5 (báo cáo, đối chiếu, execution plan)
+│   └── experiments/          # Kết quả bước 6 (results.csv/.md, biểu đồ, execution plan)
+├── experiments/              # Bước 6: script chạy thực nghiệm và vẽ biểu đồ (chạy trên máy thật)
 └── docs/                     # Tài liệu giải thích từng bước
 ```
 
@@ -120,7 +124,17 @@ Job chạy khoảng 60 giây. Kết quả:
 
 Nếu một kiểm tra đối chiếu bị sai, job kết thúc với lỗi `Đối chiếu số liệu SAI: ...`.
 
-### 6. Tắt cụm
+### 6. Chạy thực nghiệm (bước 6)
+Chạy **trên máy thật** (cần Python 3), cụm Spark phải đang bật:
+```bash
+python experiments/run_experiments.py          # toàn bộ: ~1,5 giờ, cần ~4 GB đĩa trống
+python experiments/run_experiments.py --quick  # thử nhanh: x1, x5
+pip install matplotlib && python experiments/plot_results.py   # vẽ biểu đồ
+```
+Kết quả: `reports/experiments/results.md` (bảng tổng hợp), `results.csv` (từng lần chạy),
+`fig_e1_scale.png`, `fig_e2_cores.png`. Nếu bị ngắt giữa chừng, chạy lại lệnh trên để chạy tiếp.
+
+### 7. Tắt cụm
 ```bash
 docker compose down
 ```

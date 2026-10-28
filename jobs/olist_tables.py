@@ -17,11 +17,15 @@ Ghi chú: trong các điều kiện SQL ta dùng try_cast(...) thay vì cast(...
 try_cast trả về NULL khi không ép kiểu được thay vì làm job bị lỗi.
 """
 
-# Đường dẫn bên trong container (xem phần volumes trong docker-compose.yml)
-RAW_DIR = "/data/raw"
-REPORT_DIR = "/opt/reports"
+import os
+
+# Đường dẫn bên trong container (xem phần volumes trong docker-compose.yml).
+# Có thể ghi đè bằng biến môi trường - bước thực nghiệm (experiments/) dùng cách này
+# để chạy CÙNG một code trên dữ liệu đã nhân bản x5, x10, x20 mà không phải sửa code.
+RAW_DIR = os.environ.get("OLIST_RAW_DIR", "/data/raw")
+REPORT_DIR = os.environ.get("OLIST_REPORT_DIR", "/opt/reports")
 # Data lake theo kiến trúc "medallion": raw (bronze) -> silver (đã làm sạch) -> gold (tổng hợp)
-LAKE_DIR = "/data/lake"
+LAKE_DIR = os.environ.get("OLIST_LAKE_DIR", "/data/lake")
 SILVER_DIR = LAKE_DIR + "/silver"
 GOLD_DIR = LAKE_DIR + "/gold"
 

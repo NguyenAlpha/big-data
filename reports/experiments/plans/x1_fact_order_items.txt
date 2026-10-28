@@ -1,0 +1,272 @@
+== Physical Plan ==
+AdaptiveSparkPlan (46)
++- Project (45)
+   +- BroadcastHashJoin LeftOuter BuildRight (44)
+      :- Project (35)
+      :  +- BroadcastHashJoin LeftOuter BuildRight (34)
+      :     :- Project (22)
+      :     :  +- BroadcastHashJoin Inner BuildRight (21)
+      :     :     :- Project (17)
+      :     :     :  +- BroadcastHashJoin Inner BuildRight (16)
+      :     :     :     :- Project (12)
+      :     :     :     :  +- BroadcastHashJoin Inner BuildRight (11)
+      :     :     :     :     :- Project (7)
+      :     :     :     :     :  +- BroadcastHashJoin Inner BuildRight (6)
+      :     :     :     :     :     :- Filter (2)
+      :     :     :     :     :     :  +- Scan parquet  (1)
+      :     :     :     :     :     +- BroadcastExchange (5)
+      :     :     :     :     :        +- Filter (4)
+      :     :     :     :     :           +- Scan parquet  (3)
+      :     :     :     :     +- BroadcastExchange (10)
+      :     :     :     :        +- Filter (9)
+      :     :     :     :           +- Scan parquet  (8)
+      :     :     :     +- BroadcastExchange (15)
+      :     :     :        +- Filter (14)
+      :     :     :           +- Scan parquet  (13)
+      :     :     +- BroadcastExchange (20)
+      :     :        +- Filter (19)
+      :     :           +- Scan parquet  (18)
+      :     +- BroadcastExchange (33)
+      :        +- Project (32)
+      :           +- Filter (31)
+      :              +- Window (30)
+      :                 +- WindowGroupLimit (29)
+      :                    +- Sort (28)
+      :                       +- Exchange (27)
+      :                          +- WindowGroupLimit (26)
+      :                             +- Sort (25)
+      :                                +- Filter (24)
+      :                                   +- Scan parquet  (23)
+      +- BroadcastExchange (43)
+         +- SortAggregate (42)
+            +- Sort (41)
+               +- Exchange (40)
+                  +- SortAggregate (39)
+                     +- Sort (38)
+                        +- Filter (37)
+                           +- Scan parquet  (36)
+
+
+(1) Scan parquet 
+Output [7]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/experiments/x1_c4_r2/silver/order_items]
+PushedFilters: [IsNotNull(order_id), IsNotNull(product_id), IsNotNull(seller_id)]
+ReadSchema: struct<order_id:string,order_item_id:int,product_id:string,seller_id:string,price:decimal(12,2),freight_value:decimal(12,2),item_total:decimal(12,2)>
+
+(2) Filter
+Input [7]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162]
+Condition : ((isnotnull(order_id#155) AND isnotnull(product_id#157)) AND isnotnull(seller_id#158))
+
+(3) Scan parquet 
+Output [9]: [order_id#99, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/experiments/x1_c4_r2/silver/orders]
+PushedFilters: [IsNotNull(order_id), IsNotNull(customer_id)]
+ReadSchema: struct<order_id:string,customer_id:string,order_status:string,order_purchase_timestamp:timestamp,delivery_days:int,delivery_delay_days:int,is_late:boolean>
+
+(4) Filter
+Input [9]: [order_id#99, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115]
+Condition : (isnotnull(order_id#99) AND isnotnull(customer_id#100))
+
+(5) BroadcastExchange
+Input [9]: [order_id#99, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115]
+Arguments: HashedRelationBroadcastMode(List(input[0, string, false]),false), [plan_id=467]
+
+(6) BroadcastHashJoin
+Left keys [1]: [order_id#155]
+Right keys [1]: [order_id#99]
+Join type: Inner
+Join condition: None
+
+(7) Project
+Output [15]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115]
+Input [16]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, order_id#99, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115]
+
+(8) Scan parquet 
+Output [6]: [customer_id#1, customer_unique_id#2, city#3, state#4, lat#5, lng#6]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/experiments/x1_c4_r2/silver/customers]
+PushedFilters: [IsNotNull(customer_id)]
+ReadSchema: struct<customer_id:string,customer_unique_id:string,city:string,state:string,lat:double,lng:double>
+
+(9) Filter
+Input [6]: [customer_id#1, customer_unique_id#2, city#3, state#4, lat#5, lng#6]
+Condition : isnotnull(customer_id#1)
+
+(10) BroadcastExchange
+Input [6]: [customer_id#1, customer_unique_id#2, city#3, state#4, lat#5, lng#6]
+Arguments: HashedRelationBroadcastMode(List(input[0, string, false]),false), [plan_id=471]
+
+(11) BroadcastHashJoin
+Left keys [1]: [customer_id#100]
+Right keys [1]: [customer_id#1]
+Join type: Inner
+Join condition: None
+
+(12) Project
+Output [20]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115, customer_unique_id#2, city#3, state#4, lat#5, lng#6]
+Input [21]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115, customer_id#1, customer_unique_id#2, city#3, state#4, lat#5, lng#6]
+
+(13) Scan parquet 
+Output [2]: [product_id#55, product_category_name_english#57]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/experiments/x1_c4_r2/silver/products]
+PushedFilters: [IsNotNull(product_id)]
+ReadSchema: struct<product_id:string,product_category_name_english:string>
+
+(14) Filter
+Input [2]: [product_id#55, product_category_name_english#57]
+Condition : isnotnull(product_id#55)
+
+(15) BroadcastExchange
+Input [2]: [product_id#55, product_category_name_english#57]
+Arguments: HashedRelationBroadcastMode(List(input[0, string, false]),false), [plan_id=475]
+
+(16) BroadcastHashJoin
+Left keys [1]: [product_id#157]
+Right keys [1]: [product_id#55]
+Join type: Inner
+Join condition: None
+
+(17) Project
+Output [21]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115, customer_unique_id#2, city#3, state#4, lat#5, lng#6, product_category_name_english#57]
+Input [22]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115, customer_unique_id#2, city#3, state#4, lat#5, lng#6, product_id#55, product_category_name_english#57]
+
+(18) Scan parquet 
+Output [5]: [seller_id#30, city#31, state#32, lat#33, lng#34]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/experiments/x1_c4_r2/silver/sellers]
+PushedFilters: [IsNotNull(seller_id)]
+ReadSchema: struct<seller_id:string,city:string,state:string,lat:double,lng:double>
+
+(19) Filter
+Input [5]: [seller_id#30, city#31, state#32, lat#33, lng#34]
+Condition : isnotnull(seller_id#30)
+
+(20) BroadcastExchange
+Input [5]: [seller_id#30, city#31, state#32, lat#33, lng#34]
+Arguments: HashedRelationBroadcastMode(List(input[0, string, false]),false), [plan_id=479]
+
+(21) BroadcastHashJoin
+Left keys [1]: [seller_id#158]
+Right keys [1]: [seller_id#30]
+Join type: Inner
+Join condition: None
+
+(22) Project
+Output [25]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115, customer_unique_id#2, city#3, state#4, lat#5, lng#6, product_category_name_english#57, city#31, state#32, lat#33, lng#34]
+Input [26]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115, customer_unique_id#2, city#3, state#4, lat#5, lng#6, product_category_name_english#57, seller_id#30, city#31, state#32, lat#33, lng#34]
+
+(23) Scan parquet 
+Output [5]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/experiments/x1_c4_r2/silver/reviews]
+PushedFilters: [IsNotNull(order_id)]
+ReadSchema: struct<review_id:string,order_id:string,review_score:int,review_creation_date:timestamp,review_answer_timestamp:timestamp>
+
+(24) Filter
+Input [5]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219]
+Condition : isnotnull(order_id#214)
+
+(25) Sort
+Input [5]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219]
+Arguments: [order_id#214 ASC NULLS FIRST, review_answer_timestamp#219 DESC NULLS LAST, review_creation_date#218 DESC NULLS LAST, review_id#213 ASC NULLS FIRST], false, 0
+
+(26) WindowGroupLimit
+Input [5]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219]
+Arguments: [order_id#214], [review_answer_timestamp#219 DESC NULLS LAST, review_creation_date#218 DESC NULLS LAST, review_id#213 ASC NULLS FIRST], row_number(), 1, Partial
+
+(27) Exchange
+Input [5]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219]
+Arguments: hashpartitioning(order_id#214, 16), ENSURE_REQUIREMENTS, [plan_id=485]
+
+(28) Sort
+Input [5]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219]
+Arguments: [order_id#214 ASC NULLS FIRST, review_answer_timestamp#219 DESC NULLS LAST, review_creation_date#218 DESC NULLS LAST, review_id#213 ASC NULLS FIRST], false, 0
+
+(29) WindowGroupLimit
+Input [5]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219]
+Arguments: [order_id#214], [review_answer_timestamp#219 DESC NULLS LAST, review_creation_date#218 DESC NULLS LAST, review_id#213 ASC NULLS FIRST], row_number(), 1, Final
+
+(30) Window
+Input [5]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219]
+Arguments: [row_number() windowspecdefinition(order_id#214, review_answer_timestamp#219 DESC NULLS LAST, review_creation_date#218 DESC NULLS LAST, review_id#213 ASC NULLS FIRST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rn#281], [order_id#214], [review_answer_timestamp#219 DESC NULLS LAST, review_creation_date#218 DESC NULLS LAST, review_id#213 ASC NULLS FIRST]
+
+(31) Filter
+Input [6]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219, rn#281]
+Condition : (rn#281 = 1)
+
+(32) Project
+Output [2]: [order_id#214, review_score#215]
+Input [6]: [review_id#213, order_id#214, review_score#215, review_creation_date#218, review_answer_timestamp#219, rn#281]
+
+(33) BroadcastExchange
+Input [2]: [order_id#214, review_score#215]
+Arguments: HashedRelationBroadcastMode(List(input[0, string, true]),false), [plan_id=492]
+
+(34) BroadcastHashJoin
+Left keys [1]: [order_id#155]
+Right keys [1]: [order_id#214]
+Join type: LeftOuter
+Join condition: None
+
+(35) Project
+Output [26]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115, customer_unique_id#2, city#3, state#4, lat#5, lng#6, product_category_name_english#57, city#31, state#32, lat#33, lng#34, review_score#215]
+Input [27]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115, customer_unique_id#2, city#3, state#4, lat#5, lng#6, product_category_name_english#57, city#31, state#32, lat#33, lng#34, order_id#214, review_score#215]
+
+(36) Scan parquet 
+Output [4]: [order_id#184, payment_type#186, payment_installments#187, payment_value#188]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/experiments/x1_c4_r2/silver/payments]
+PushedFilters: [IsNotNull(order_id)]
+ReadSchema: struct<order_id:string,payment_type:string,payment_installments:int,payment_value:decimal(12,2)>
+
+(37) Filter
+Input [4]: [order_id#184, payment_type#186, payment_installments#187, payment_value#188]
+Condition : isnotnull(order_id#184)
+
+(38) Sort
+Input [4]: [order_id#184, payment_type#186, payment_installments#187, payment_value#188]
+Arguments: [order_id#184 ASC NULLS FIRST], false, 0
+
+(39) SortAggregate
+Input [4]: [order_id#184, payment_type#186, payment_installments#187, payment_value#188]
+Keys [1]: [order_id#184]
+Functions [2]: [partial_max(payment_installments#187), partial_max_by(payment_type#186, payment_value#188)]
+Aggregate Attributes [3]: [max#322, valueWithExtremumOrdering#323, extremumOrdering#324]
+Results [4]: [order_id#184, max#325, valueWithExtremumOrdering#326, extremumOrdering#327]
+
+(40) Exchange
+Input [4]: [order_id#184, max#325, valueWithExtremumOrdering#326, extremumOrdering#327]
+Arguments: hashpartitioning(order_id#184, 16), ENSURE_REQUIREMENTS, [plan_id=498]
+
+(41) Sort
+Input [4]: [order_id#184, max#325, valueWithExtremumOrdering#326, extremumOrdering#327]
+Arguments: [order_id#184 ASC NULLS FIRST], false, 0
+
+(42) SortAggregate
+Input [4]: [order_id#184, max#325, valueWithExtremumOrdering#326, extremumOrdering#327]
+Keys [1]: [order_id#184]
+Functions [2]: [max(payment_installments#187), max_by(payment_type#186, payment_value#188)]
+Aggregate Attributes [2]: [max(payment_installments#187)#274, max_by(payment_type#186, payment_value#188)#275]
+Results [3]: [order_id#184, max(payment_installments#187)#274 AS max_installments#270, max_by(payment_type#186, payment_value#188)#275 AS main_payment_type#271]
+
+(43) BroadcastExchange
+Input [3]: [order_id#184, max_installments#270, main_payment_type#271]
+Arguments: HashedRelationBroadcastMode(List(input[0, string, true]),false), [plan_id=502]
+
+(44) BroadcastHashJoin
+Left keys [1]: [order_id#155]
+Right keys [1]: [order_id#184]
+Join type: LeftOuter
+Join condition: None
+
+(45) Project
+Output [27]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, customer_id#100, customer_unique_id#2, order_status#101, NOT order_status#101 IN (canceled,unavailable) AS is_valid_sale#287, order_purchase_timestamp#102, cast(order_purchase_timestamp#102 as date) AS purchase_date#288, product_category_name_english#57 AS category#289, price#160, freight_value#161, item_total#162, state#4 AS customer_state#290, city#3 AS customer_city#291, state#32 AS seller_state#292, city#31 AS seller_city#293, round((12742.0 * ASIN(SQRT((pow(SIN((RADIANS((lat#5 - lat#33)) / 2.0)), 2.0) + ((COS(RADIANS(lat#33)) * COS(RADIANS(lat#5))) * pow(SIN((RADIANS((lng#6 - lng#34)) / 2.0)), 2.0)))))), 1) AS distance_km#294, delivery_days#107, delivery_delay_days#108, is_late#109, review_score#215, main_payment_type#271, max_installments#270, purchase_year#114, purchase_month#115]
+Input [29]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, price#160, freight_value#161, item_total#162, customer_id#100, order_status#101, order_purchase_timestamp#102, delivery_days#107, delivery_delay_days#108, is_late#109, purchase_year#114, purchase_month#115, customer_unique_id#2, city#3, state#4, lat#5, lng#6, product_category_name_english#57, city#31, state#32, lat#33, lng#34, review_score#215, order_id#184, max_installments#270, main_payment_type#271]
+
+(46) AdaptiveSparkPlan
+Output [27]: [order_id#155, order_item_id#156, product_id#157, seller_id#158, customer_id#100, customer_unique_id#2, order_status#101, is_valid_sale#287, order_purchase_timestamp#102, purchase_date#288, category#289, price#160, freight_value#161, item_total#162, customer_state#290, customer_city#291, seller_state#292, seller_city#293, distance_km#294, delivery_days#107, delivery_delay_days#108, is_late#109, review_score#215, main_payment_type#271, max_installments#270, purchase_year#114, purchase_month#115]
+Arguments: isFinalPlan=false
+

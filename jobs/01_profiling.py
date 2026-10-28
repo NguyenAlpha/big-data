@@ -46,8 +46,8 @@ from datetime import datetime
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
-from common import (Timer, fmt, md_cell, normalize_text, read_raw_csv, setup_logger,
-                    wait_for_executors)
+from common import (Timer, dir_size_mb, fmt, md_cell, normalize_text, read_raw_csv,
+                    setup_logger, wait_for_executors)
 from olist_tables import FOREIGN_KEYS, REPORT_DIR, TABLES
 
 OUT_DIR = os.path.join(REPORT_DIR, "profiling")
@@ -337,7 +337,7 @@ def main():
                 result["extras"] = extra_checks(name, df)
             result.update({
                 "file": spec["file"],
-                "size_mb": round(os.path.getsize(path) / 1024 / 1024, 2),
+                "size_mb": dir_size_mb(path),
                 # Số mảnh dữ liệu Spark chia ra = số task chạy song song khi quét bảng
                 "partitions": df.rdd.getNumPartitions(),
                 "seconds": t.seconds,
@@ -372,7 +372,8 @@ def main():
     with open(os.path.join(OUT_DIR, "profiling_summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2, default=str)
     write_markdown(summary, os.path.join(OUT_DIR, "profiling_report.md"))
-    log.info("Xong sau %.2fs. Báo cáo: reports/profiling/profiling_report.md", job_timer.seconds)
+    log.info("Xong sau %.2fs. Báo cáo: %s", job_timer.seconds,
+             os.path.join(OUT_DIR, "profiling_report.md"))
     spark.stop()
 
 

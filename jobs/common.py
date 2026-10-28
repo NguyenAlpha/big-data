@@ -161,7 +161,12 @@ def md_cell(value, max_len=40):
 
 
 def dir_size_mb(path):
-    """Tổng dung lượng 1 thư mục (Spark ghi Parquet thành thư mục nhiều file)."""
+    """
+    Dung lượng (MB) của 1 file hoặc 1 thư mục. Spark ghi dữ liệu thành THƯ MỤC nhiều
+    file part-xxxx (vd dữ liệu nhân bản ở bước thực nghiệm), nên phải cộng dồn.
+    """
+    if os.path.isfile(path):
+        return round(os.path.getsize(path) / 1024 / 1024, 2)
     total = 0
     for root, _, files in os.walk(path):
         total += sum(os.path.getsize(os.path.join(root, f)) for f in files)

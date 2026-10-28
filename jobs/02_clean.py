@@ -527,7 +527,7 @@ def main():
     for name, spec in TABLES.items():
         df, path, _ = read_raw_csv(spark, spec["file"], spec.get("multiline", False))
         raw[name] = df.cache()
-        raw_size[name] = round(os.path.getsize(path) / 1024 / 1024, 2)
+        raw_size[name] = dir_size_mb(path)
 
     # --- Kế hoạch làm sạch: (bảng silver, các bảng nguồn, hàm làm sạch) ---
     # geolocation phải chạy trước vì customers/sellers cần toạ độ của nó.
@@ -598,7 +598,8 @@ def main():
     with open(os.path.join(OUT_DIR, "cleaning_summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2, default=str)
     write_markdown(summary, os.path.join(OUT_DIR, "cleaning_report.md"))
-    log.info("Xong sau %.2fs. Báo cáo: reports/cleaning/cleaning_report.md", job_timer.seconds)
+    log.info("Xong sau %.2fs. Báo cáo: %s", job_timer.seconds,
+             os.path.join(OUT_DIR, "cleaning_report.md"))
     spark.stop()
 
 

@@ -320,8 +320,9 @@ def main():
     write_markdown(summary, os.path.join(OUT_DIR, "gold_report.md"))
 
     failed = [c["check"] for c in checks if not c["ok"]]
-    log.info("Xong sau %.2fs. Đối chiếu: %d/%d đạt. Báo cáo: reports/gold/gold_report.md",
-             job_timer.seconds, len(checks) - len(failed), len(checks))
+    log.info("Xong sau %.2fs. Đối chiếu: %d/%d đạt. Báo cáo: %s",
+             job_timer.seconds, len(checks) - len(failed), len(checks),
+             os.path.join(OUT_DIR, "gold_report.md"))
     spark.stop()
     if failed:
         raise SystemExit("Đối chiếu số liệu SAI: " + "; ".join(failed))
