@@ -1,0 +1,976 @@
+{
+  "run": {
+    "started_at": "2026-10-28 03:02:29",
+    "spark_version": "3.5.3",
+    "master": "spark://spark-master:7077",
+    "executors": 2,
+    "default_parallelism": 4,
+    "raw_size_mb": 120.35,
+    "silver_size_mb": 40.37,
+    "rows_in": 1550922,
+    "rows_out": 569698,
+    "clean_seconds": 46.3,
+    "validate_seconds": 10.05,
+    "total_seconds": 70.07
+  },
+  "tables": {
+    "geolocation": {
+      "sources": [
+        "olist_geolocation_dataset.csv"
+      ],
+      "rows_in": 1000163,
+      "columns_in": 5,
+      "raw_size_mb": 58.44,
+      "actions": [
+        {
+          "type": "Loại bỏ",
+          "action": "Dòng trùng lặp hoàn toàn",
+          "rows": 261831
+        },
+        {
+          "type": "Loại bỏ",
+          "action": "Toạ độ nằm ngoài lãnh thổ Brazil",
+          "rows": 33
+        },
+        {
+          "type": "Sửa",
+          "action": "Chuẩn hoá tên thành phố (chữ thường, bỏ dấu, bỏ ký tự rác)",
+          "rows": 63454
+        },
+        {
+          "type": "Sửa",
+          "action": "Gộp các điểm toạ độ của cùng 1 mã zip thành 1 dòng (toạ độ trung bình, tên thành phố/bang phổ biến nhất)",
+          "rows": 738299
+        }
+      ],
+      "seconds": 19.91,
+      "validation": {
+        "rows": 19010,
+        "key_columns": [
+          "zip_code_prefix"
+        ],
+        "key_duplicate_rows": 0,
+        "schema": [
+          [
+            "zip_code_prefix",
+            "string"
+          ],
+          [
+            "city",
+            "string"
+          ],
+          [
+            "state",
+            "string"
+          ],
+          [
+            "lat",
+            "double"
+          ],
+          [
+            "lng",
+            "double"
+          ],
+          [
+            "n_points",
+            "bigint"
+          ]
+        ],
+        "nulls": {
+          "zip_code_prefix": 0,
+          "city": 0,
+          "state": 0,
+          "lat": 0,
+          "lng": 0,
+          "n_points": 0
+        },
+        "parquet_files": 2,
+        "size_mb": 0.5,
+        "samples": [
+          {
+            "zip_code_prefix": "12230",
+            "city": "sao jose dos campos",
+            "state": "SP",
+            "lat": -23.22588,
+            "lng": -45.887548,
+            "n_points": 169
+          },
+          {
+            "zip_code_prefix": "12232",
+            "city": "sao jose dos campos",
+            "state": "SP",
+            "lat": -23.25729,
+            "lng": -45.8876,
+            "n_points": 88
+          }
+        ]
+      }
+    },
+    "customers": {
+      "sources": [
+        "olist_customers_dataset.csv",
+        "olist_geolocation_dataset.csv"
+      ],
+      "rows_in": 99441,
+      "columns_in": 5,
+      "raw_size_mb": 8.62,
+      "actions": [
+        {
+          "type": "Loại bỏ",
+          "action": "Trùng khoá chính `customer_id`",
+          "rows": 0
+        },
+        {
+          "type": "Sửa",
+          "action": "Chuẩn hoá tên thành phố",
+          "rows": 0
+        },
+        {
+          "type": "Bổ sung",
+          "action": "Thêm toạ độ `lat`, `lng` từ bảng geolocation (broadcast join)",
+          "rows": null
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_zip_not_in_geolocation`: mã zip không có trong bảng toạ độ",
+          "rows": 279
+        }
+      ],
+      "seconds": 4.82,
+      "validation": {
+        "rows": 99441,
+        "key_columns": [
+          "customer_id"
+        ],
+        "key_duplicate_rows": 0,
+        "schema": [
+          [
+            "zip_code_prefix",
+            "string"
+          ],
+          [
+            "customer_id",
+            "string"
+          ],
+          [
+            "customer_unique_id",
+            "string"
+          ],
+          [
+            "city",
+            "string"
+          ],
+          [
+            "state",
+            "string"
+          ],
+          [
+            "lat",
+            "double"
+          ],
+          [
+            "lng",
+            "double"
+          ],
+          [
+            "dq_zip_not_in_geolocation",
+            "boolean"
+          ]
+        ],
+        "nulls": {
+          "zip_code_prefix": 0,
+          "customer_id": 0,
+          "customer_unique_id": 0,
+          "city": 0,
+          "state": 0,
+          "lat": 279,
+          "lng": 279,
+          "dq_zip_not_in_geolocation": 0
+        },
+        "parquet_files": 5,
+        "size_mb": 7.82,
+        "samples": [
+          {
+            "zip_code_prefix": "06273",
+            "customer_id": "00012a2ce6f8dcda20d059ce98491703",
+            "customer_unique_id": "248ffe10d632bebe4f7267f1f44844c9",
+            "city": "osasco",
+            "state": "SP",
+            "lat": -23.499149,
+            "lng": -46.767812,
+            "dq_zip_not_in_geolocation": false
+          },
+          {
+            "zip_code_prefix": "35550",
+            "customer_id": "000161a058600d5901f007fab4c27140",
+            "customer_unique_id": "b0015e09bb4b6e47c52844fab5fb6638",
+            "city": "itapecerica",
+            "state": "MG",
+            "lat": -20.469287,
+            "lng": -45.123459,
+            "dq_zip_not_in_geolocation": false
+          }
+        ]
+      }
+    },
+    "sellers": {
+      "sources": [
+        "olist_sellers_dataset.csv",
+        "olist_geolocation_dataset.csv"
+      ],
+      "rows_in": 3095,
+      "columns_in": 4,
+      "raw_size_mb": 0.17,
+      "actions": [
+        {
+          "type": "Loại bỏ",
+          "action": "Trùng khoá chính `seller_id`",
+          "rows": 0
+        },
+        {
+          "type": "Sửa",
+          "action": "Chuẩn hoá tên thành phố",
+          "rows": 25
+        },
+        {
+          "type": "Bổ sung",
+          "action": "Thêm toạ độ `lat`, `lng` từ bảng geolocation (broadcast join)",
+          "rows": null
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_zip_not_in_geolocation`: mã zip không có trong bảng toạ độ",
+          "rows": 7
+        }
+      ],
+      "seconds": 1.51,
+      "validation": {
+        "rows": 3095,
+        "key_columns": [
+          "seller_id"
+        ],
+        "key_duplicate_rows": 0,
+        "schema": [
+          [
+            "zip_code_prefix",
+            "string"
+          ],
+          [
+            "seller_id",
+            "string"
+          ],
+          [
+            "city",
+            "string"
+          ],
+          [
+            "state",
+            "string"
+          ],
+          [
+            "lat",
+            "double"
+          ],
+          [
+            "lng",
+            "double"
+          ],
+          [
+            "dq_zip_not_in_geolocation",
+            "boolean"
+          ]
+        ],
+        "nulls": {
+          "zip_code_prefix": 0,
+          "seller_id": 0,
+          "city": 0,
+          "state": 0,
+          "lat": 7,
+          "lng": 7,
+          "dq_zip_not_in_geolocation": 0
+        },
+        "parquet_files": 1,
+        "size_mb": 0.17,
+        "samples": [
+          {
+            "zip_code_prefix": "09080",
+            "seller_id": "0015a82c2db000af6aaaf3ae2ecb0532",
+            "city": "santo andre",
+            "state": "SP",
+            "lat": -23.640202,
+            "lng": -46.542079,
+            "dq_zip_not_in_geolocation": false
+          },
+          {
+            "zip_code_prefix": "29156",
+            "seller_id": "001cca7ae9ae17fb1caed9dfb1094831",
+            "city": "cariacica",
+            "state": "ES",
+            "lat": -20.279224,
+            "lng": -40.411514,
+            "dq_zip_not_in_geolocation": false
+          }
+        ]
+      }
+    },
+    "products": {
+      "sources": [
+        "olist_products_dataset.csv",
+        "product_category_name_translation.csv"
+      ],
+      "rows_in": 32951,
+      "columns_in": 9,
+      "raw_size_mb": 2.27,
+      "actions": [
+        {
+          "type": "Sửa",
+          "action": "Đổi tên cột sai chính tả `product_name_lenght`, `product_description_lenght` -> `..._length`",
+          "rows": null
+        },
+        {
+          "type": "Loại bỏ",
+          "action": "Trùng khoá chính `product_id`",
+          "rows": 0
+        },
+        {
+          "type": "Sửa",
+          "action": "Danh mục rỗng -> 'unknown'; gắn cờ `dq_missing_category`",
+          "rows": 610
+        },
+        {
+          "type": "Sửa",
+          "action": "Khối lượng 0 gram -> NULL; gắn cờ `dq_zero_weight`",
+          "rows": 4
+        },
+        {
+          "type": "Bổ sung",
+          "action": "Thêm tên danh mục tiếng Anh (broadcast join bảng dịch + 2 bản dịch thủ công)",
+          "rows": 13
+        }
+      ],
+      "seconds": 2.82,
+      "validation": {
+        "rows": 32951,
+        "key_columns": [
+          "product_id"
+        ],
+        "key_duplicate_rows": 0,
+        "schema": [
+          [
+            "product_id",
+            "string"
+          ],
+          [
+            "product_category_name",
+            "string"
+          ],
+          [
+            "product_category_name_english",
+            "string"
+          ],
+          [
+            "product_name_length",
+            "int"
+          ],
+          [
+            "product_description_length",
+            "int"
+          ],
+          [
+            "product_photos_qty",
+            "int"
+          ],
+          [
+            "product_weight_g",
+            "double"
+          ],
+          [
+            "product_length_cm",
+            "double"
+          ],
+          [
+            "product_height_cm",
+            "double"
+          ],
+          [
+            "product_width_cm",
+            "double"
+          ],
+          [
+            "dq_missing_category",
+            "boolean"
+          ],
+          [
+            "dq_zero_weight",
+            "boolean"
+          ],
+          [
+            "dq_translation_added_manually",
+            "boolean"
+          ]
+        ],
+        "nulls": {
+          "product_id": 0,
+          "product_category_name": 0,
+          "product_category_name_english": 0,
+          "product_name_length": 610,
+          "product_description_length": 610,
+          "product_photos_qty": 610,
+          "product_weight_g": 6,
+          "product_length_cm": 2,
+          "product_height_cm": 2,
+          "product_width_cm": 2,
+          "dq_missing_category": 0,
+          "dq_zero_weight": 0,
+          "dq_translation_added_manually": 0
+        },
+        "parquet_files": 2,
+        "size_mb": 1.32,
+        "samples": [
+          {
+            "product_id": "00088930e925c41fd95ebfe695fd2655",
+            "product_category_name": "automotivo",
+            "product_category_name_english": "auto",
+            "product_name_length": 56,
+            "product_description_length": 752,
+            "product_photos_qty": 4,
+            "product_weight_g": 1225.0,
+            "product_length_cm": 55.0,
+            "product_height_cm": 10.0,
+            "product_width_cm": 26.0,
+            "dq_missing_category": false,
+            "dq_zero_weight": false,
+            "dq_translation_added_manually": false
+          },
+          {
+            "product_id": "0009406fd7479715e4bef61dd91f2462",
+            "product_category_name": "cama_mesa_banho",
+            "product_category_name_english": "bed_bath_table",
+            "product_name_length": 50,
+            "product_description_length": 266,
+            "product_photos_qty": 2,
+            "product_weight_g": 300.0,
+            "product_length_cm": 45.0,
+            "product_height_cm": 15.0,
+            "product_width_cm": 35.0,
+            "dq_missing_category": false,
+            "dq_zero_weight": false,
+            "dq_translation_added_manually": false
+          }
+        ]
+      }
+    },
+    "orders": {
+      "sources": [
+        "olist_orders_dataset.csv"
+      ],
+      "rows_in": 99441,
+      "columns_in": 8,
+      "raw_size_mb": 16.84,
+      "actions": [
+        {
+          "type": "Sửa",
+          "action": "Ép 5 cột ngày giờ từ chuỗi sang timestamp",
+          "rows": null
+        },
+        {
+          "type": "Loại bỏ",
+          "action": "Trùng khoá chính `order_id`",
+          "rows": 0
+        },
+        {
+          "type": "Bổ sung",
+          "action": "Thêm cột `purchase_year`, `purchase_month`, `delivery_days`, `delivery_delay_days`, `is_late`",
+          "rows": null
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_delivered_without_date`: Đơn 'delivered' nhưng thiếu ngày khách nhận hàng",
+          "rows": 8
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_carrier_before_purchase`: Ngày giao cho đơn vị vận chuyển sớm hơn ngày mua",
+          "rows": 166
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_no_items`: Đơn không có dòng sản phẩm nào",
+          "rows": 775
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_no_payment`: Đơn không có thông tin thanh toán",
+          "rows": 1
+        }
+      ],
+      "seconds": 7.91,
+      "validation": {
+        "rows": 99441,
+        "key_columns": [
+          "order_id"
+        ],
+        "key_duplicate_rows": 0,
+        "schema": [
+          [
+            "order_id",
+            "string"
+          ],
+          [
+            "customer_id",
+            "string"
+          ],
+          [
+            "order_status",
+            "string"
+          ],
+          [
+            "order_purchase_timestamp",
+            "timestamp"
+          ],
+          [
+            "order_approved_at",
+            "timestamp"
+          ],
+          [
+            "order_delivered_carrier_date",
+            "timestamp"
+          ],
+          [
+            "order_delivered_customer_date",
+            "timestamp"
+          ],
+          [
+            "order_estimated_delivery_date",
+            "timestamp"
+          ],
+          [
+            "delivery_days",
+            "int"
+          ],
+          [
+            "delivery_delay_days",
+            "int"
+          ],
+          [
+            "is_late",
+            "boolean"
+          ],
+          [
+            "dq_delivered_without_date",
+            "boolean"
+          ],
+          [
+            "dq_carrier_before_purchase",
+            "boolean"
+          ],
+          [
+            "dq_no_items",
+            "boolean"
+          ],
+          [
+            "dq_no_payment",
+            "boolean"
+          ],
+          [
+            "purchase_year",
+            "int"
+          ],
+          [
+            "purchase_month",
+            "int"
+          ]
+        ],
+        "nulls": {
+          "order_id": 0,
+          "customer_id": 0,
+          "order_status": 0,
+          "order_purchase_timestamp": 0,
+          "order_approved_at": 160,
+          "order_delivered_carrier_date": 1783,
+          "order_delivered_customer_date": 2965,
+          "order_estimated_delivery_date": 0,
+          "delivery_days": 2965,
+          "delivery_delay_days": 2965,
+          "is_late": 2965,
+          "dq_delivered_without_date": 0,
+          "dq_carrier_before_purchase": 0,
+          "dq_no_items": 0,
+          "dq_no_payment": 0,
+          "purchase_year": 0,
+          "purchase_month": 0
+        },
+        "parquet_files": 25,
+        "size_mb": 9.98,
+        "samples": [
+          {
+            "order_id": "0030d783f979fbc5981e75613b057344",
+            "customer_id": "84ddc138522822dfb51b603c2f466a18",
+            "order_status": "delivered",
+            "order_purchase_timestamp": "2017-11-24 20:03:02",
+            "order_approved_at": "2017-11-24 23:13:38",
+            "order_delivered_carrier_date": "2017-12-15 19:34:13",
+            "order_delivered_customer_date": "2018-01-06 00:25:43",
+            "order_estimated_delivery_date": "2017-12-15 00:00:00",
+            "delivery_days": 43,
+            "delivery_delay_days": 22,
+            "is_late": true,
+            "dq_delivered_without_date": false,
+            "dq_carrier_before_purchase": false,
+            "dq_no_items": false,
+            "dq_no_payment": false,
+            "purchase_year": 2017,
+            "purchase_month": 11
+          },
+          {
+            "order_id": "0035c0b07126fe9c24a325216fb96064",
+            "customer_id": "c8c4991d84dbfef1f61c6152486db6d4",
+            "order_status": "delivered",
+            "order_purchase_timestamp": "2017-11-24 01:08:37",
+            "order_approved_at": "2017-11-24 01:29:45",
+            "order_delivered_carrier_date": "2017-11-28 17:17:17",
+            "order_delivered_customer_date": "2017-12-07 16:59:21",
+            "order_estimated_delivery_date": "2018-01-03 00:00:00",
+            "delivery_days": 13,
+            "delivery_delay_days": -27,
+            "is_late": false,
+            "dq_delivered_without_date": false,
+            "dq_carrier_before_purchase": false,
+            "dq_no_items": false,
+            "dq_no_payment": false,
+            "purchase_year": 2017,
+            "purchase_month": 11
+          }
+        ]
+      }
+    },
+    "order_items": {
+      "sources": [
+        "olist_order_items_dataset.csv"
+      ],
+      "rows_in": 112650,
+      "columns_in": 7,
+      "raw_size_mb": 14.72,
+      "actions": [
+        {
+          "type": "Sửa",
+          "action": "Ép kiểu: `order_item_id` -> int, ngày -> timestamp, tiền -> decimal(12,2)",
+          "rows": null
+        },
+        {
+          "type": "Loại bỏ",
+          "action": "Trùng khoá chính (`order_id`, `order_item_id`)",
+          "rows": 0
+        },
+        {
+          "type": "Bổ sung",
+          "action": "Thêm `item_total` = giá + phí vận chuyển",
+          "rows": null
+        }
+      ],
+      "seconds": 2.4,
+      "validation": {
+        "rows": 112650,
+        "key_columns": [
+          "order_id",
+          "order_item_id"
+        ],
+        "key_duplicate_rows": 0,
+        "schema": [
+          [
+            "order_id",
+            "string"
+          ],
+          [
+            "order_item_id",
+            "int"
+          ],
+          [
+            "product_id",
+            "string"
+          ],
+          [
+            "seller_id",
+            "string"
+          ],
+          [
+            "shipping_limit_date",
+            "timestamp"
+          ],
+          [
+            "price",
+            "decimal(12,2)"
+          ],
+          [
+            "freight_value",
+            "decimal(12,2)"
+          ],
+          [
+            "item_total",
+            "decimal(12,2)"
+          ]
+        ],
+        "nulls": {
+          "order_id": 0,
+          "order_item_id": 0,
+          "product_id": 0,
+          "seller_id": 0,
+          "shipping_limit_date": 0,
+          "price": 0,
+          "freight_value": 0,
+          "item_total": 0
+        },
+        "parquet_files": 5,
+        "size_mb": 7.87,
+        "samples": [
+          {
+            "order_id": "00042b26cf59d7ce69dfabb4e55b4fd9",
+            "order_item_id": 1,
+            "product_id": "ac6c3623068f30de03045865e4e10089",
+            "seller_id": "df560393f3a51e74553ab94004ba5c87",
+            "shipping_limit_date": "2017-02-13 13:57:51",
+            "price": "199.90",
+            "freight_value": "18.14",
+            "item_total": "218.04"
+          },
+          {
+            "order_id": "00054e8431b9d7675808bcb819fb4a32",
+            "order_item_id": 1,
+            "product_id": "8d4f2bb7e93e6710a28f34fa83ee7d28",
+            "seller_id": "7040e82f899a04d1b434b795a43b4617",
+            "shipping_limit_date": "2017-12-14 12:10:31",
+            "price": "19.90",
+            "freight_value": "11.85",
+            "item_total": "31.75"
+          }
+        ]
+      }
+    },
+    "payments": {
+      "sources": [
+        "olist_order_payments_dataset.csv"
+      ],
+      "rows_in": 103886,
+      "columns_in": 5,
+      "raw_size_mb": 5.51,
+      "actions": [
+        {
+          "type": "Sửa",
+          "action": "Ép kiểu số và tiền decimal(12,2)",
+          "rows": null
+        },
+        {
+          "type": "Loại bỏ",
+          "action": "Trùng khoá chính (`order_id`, `payment_sequential`)",
+          "rows": 0
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_undefined_type`: phương thức 'not_defined' (đều là đơn đã huỷ)",
+          "rows": 3
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_zero_installments`: số kỳ trả góp = 0",
+          "rows": 2
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_zero_value`: số tiền = 0 (chủ yếu voucher 0 đồng)",
+          "rows": 9
+        }
+      ],
+      "seconds": 1.92,
+      "validation": {
+        "rows": 103886,
+        "key_columns": [
+          "order_id",
+          "payment_sequential"
+        ],
+        "key_duplicate_rows": 0,
+        "schema": [
+          [
+            "order_id",
+            "string"
+          ],
+          [
+            "payment_sequential",
+            "int"
+          ],
+          [
+            "payment_type",
+            "string"
+          ],
+          [
+            "payment_installments",
+            "int"
+          ],
+          [
+            "payment_value",
+            "decimal(12,2)"
+          ],
+          [
+            "dq_undefined_type",
+            "boolean"
+          ],
+          [
+            "dq_zero_installments",
+            "boolean"
+          ],
+          [
+            "dq_zero_value",
+            "boolean"
+          ]
+        ],
+        "nulls": {
+          "order_id": 0,
+          "payment_sequential": 0,
+          "payment_type": 0,
+          "payment_installments": 0,
+          "payment_value": 0,
+          "dq_undefined_type": 0,
+          "dq_zero_installments": 0,
+          "dq_zero_value": 0
+        },
+        "parquet_files": 4,
+        "size_mb": 3.59,
+        "samples": [
+          {
+            "order_id": "00042b26cf59d7ce69dfabb4e55b4fd9",
+            "payment_sequential": 1,
+            "payment_type": "credit_card",
+            "payment_installments": 3,
+            "payment_value": "218.04",
+            "dq_undefined_type": false,
+            "dq_zero_installments": false,
+            "dq_zero_value": false
+          },
+          {
+            "order_id": "00054e8431b9d7675808bcb819fb4a32",
+            "payment_sequential": 1,
+            "payment_type": "credit_card",
+            "payment_installments": 1,
+            "payment_value": "31.75",
+            "dq_undefined_type": false,
+            "dq_zero_installments": false,
+            "dq_zero_value": false
+          }
+        ]
+      }
+    },
+    "reviews": {
+      "sources": [
+        "olist_order_reviews_dataset.csv"
+      ],
+      "rows_in": 99224,
+      "columns_in": 7,
+      "raw_size_mb": 13.78,
+      "actions": [
+        {
+          "type": "Loại bỏ",
+          "action": "Trùng khoá chính (`review_id`, `order_id`)",
+          "rows": 0
+        },
+        {
+          "type": "Sửa",
+          "action": "Bình luận nhiều dòng -> 1 dòng (thay xuống dòng bằng dấu cách)",
+          "rows": 3852
+        },
+        {
+          "type": "Bổ sung",
+          "action": "Thêm `has_comment` (khách có viết bình luận hay chỉ chấm sao)",
+          "rows": null
+        },
+        {
+          "type": "Gắn cờ",
+          "action": "`dq_review_id_reused`: cùng `review_id` dùng cho nhiều đơn",
+          "rows": 1603
+        }
+      ],
+      "seconds": 4.45,
+      "validation": {
+        "rows": 99224,
+        "key_columns": [
+          "review_id",
+          "order_id"
+        ],
+        "key_duplicate_rows": 0,
+        "schema": [
+          [
+            "review_id",
+            "string"
+          ],
+          [
+            "order_id",
+            "string"
+          ],
+          [
+            "review_score",
+            "int"
+          ],
+          [
+            "review_comment_title",
+            "string"
+          ],
+          [
+            "review_comment_message",
+            "string"
+          ],
+          [
+            "review_creation_date",
+            "timestamp"
+          ],
+          [
+            "review_answer_timestamp",
+            "timestamp"
+          ],
+          [
+            "has_comment",
+            "boolean"
+          ],
+          [
+            "dq_review_id_reused",
+            "boolean"
+          ]
+        ],
+        "nulls": {
+          "review_id": 0,
+          "order_id": 0,
+          "review_score": 0,
+          "review_comment_title": 87658,
+          "review_comment_message": 58274,
+          "review_creation_date": 0,
+          "review_answer_timestamp": 0,
+          "has_comment": 0,
+          "dq_review_id_reused": 0
+        },
+        "parquet_files": 5,
+        "size_mb": 9.12,
+        "samples": [
+          {
+            "review_id": "00032b0141443497c898b3093690af51",
+            "order_id": "04fb47576993a3cb0c12d4b25eab6e4e",
+            "review_score": 5,
+            "review_comment_title": null,
+            "review_comment_message": null,
+            "review_creation_date": "2017-05-30 00:00:00",
+            "review_answer_timestamp": "2017-06-01 23:28:55",
+            "has_comment": false,
+            "dq_review_id_reused": false
+          },
+          {
+            "review_id": "000359bceee1b6fe876b30d35b5f9ef2",
+            "order_id": "97868e4c884bc85f4501ae0a66181cc9",
+            "review_score": 5,
+            "review_comment_title": null,
+            "review_comment_message": null,
+            "review_creation_date": "2018-02-06 00:00:00",
+            "review_answer_timestamp": "2018-02-06 20:54:37",
+            "has_comment": false,
+            "dq_review_id_reused": false
+          }
+        ]
+      }
+    }
+  }
+}

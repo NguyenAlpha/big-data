@@ -16,7 +16,7 @@ bằng **Apache Spark (PySpark)** chạy trên cụm Spark Standalone dựng b�
 | 1 | Xác định phạm vi, input/output | Xong | README này |
 | 2 | Dựng cụm Spark bằng Docker (1 master + 2 worker) | Xong | [docs/01-moi-truong-spark.md](docs/01-moi-truong-spark.md) |
 | 3 | Data profiling: khảo sát chất lượng dữ liệu **trước** xử lý | Xong | [docs/02-data-profiling.md](docs/02-data-profiling.md) |
-| 4 | Làm sạch và chuẩn hoá, lưu Parquet (silver) | Chưa làm | |
+| 4 | Làm sạch và chuẩn hoá, lưu Parquet (silver) | Xong | [docs/03-lam-sach-du-lieu.md](docs/03-lam-sach-du-lieu.md) |
 | 5 | Kết hợp và tổng hợp bằng Spark SQL (gold) | Chưa làm | |
 | 6 | Thực nghiệm: chất lượng sau xử lý, thời gian, mở rộng quy mô | Chưa làm | |
 
@@ -26,12 +26,16 @@ bằng **Apache Spark (PySpark)** chạy trên cụm Spark Standalone dựng b�
 .
 ├── docker-compose.yml        # Cụm Spark: spark-master, spark-worker-1, spark-worker-2
 ├── dataset/                  # CSV gốc của Olist (KHÔNG có trên git, xem bên dưới)
-├── data/                     # Dữ liệu sinh ra bởi job (silver/gold), không có trên git
+├── data/                     # Dữ liệu sinh ra bởi job, không có trên git
+│   └── silver/               # Bước 4: 8 bảng Parquet đã làm sạch
 ├── jobs/
 │   ├── olist_tables.py       # "Data contract": mô tả bảng, khoá, kiểu, luật kiểm tra
-│   └── 01_profiling.py       # Bước 3: job profiling
+│   ├── common.py             # Hàm dùng chung: đọc CSV, chuẩn hoá chữ, log, đo thời gian
+│   ├── 01_profiling.py       # Bước 3: job profiling
+│   └── 02_clean.py           # Bước 4: job làm sạch raw CSV -> silver Parquet
 ├── reports/
-│   └── profiling/            # Kết quả bước 3 (báo cáo .md, số liệu .json, log)
+│   ├── profiling/            # Kết quả bước 3 (báo cáo .md, số liệu .json, log)
+│   └── cleaning/             # Kết quả bước 4 (báo cáo trước/sau, số liệu .json, log)
 └── docs/                     # Tài liệu giải thích từng bước
 ```
 
@@ -83,7 +87,20 @@ Kết quả nằm trong `reports/profiling/`:
 | `profiling_summary.json` | Cùng số liệu ở dạng JSON, để bước sau so sánh trước/sau |
 | `profiling_run.log` | Log thời gian xử lý từng bảng |
 
-### 4. Tắt cụm
+### 4. Chạy job làm sạch (bước 4)
+```bash
+docker compose exec spark-master /opt/spark/bin/spark-submit     --master spark://spark-master:7077 /opt/jobs/02_clean.py
+```
+Job chạy khoảng 70 giây (không phụ thuộc bước 3, chạy riêng được). Kết quả:
+
+| Đầu ra | Nội dung |
+|---|---|
+| `data/silver/<bảng>/` | 8 bảng Parquet: geolocation, customers, sellers, products, orders, order_items, payments, reviews |
+| `reports/cleaning/cleaning_report.md` | Số dòng trước/sau, các thao tác đã áp dụng, schema và % NULL của bảng silver |
+| `reports/cleaning/cleaning_summary.json` | Cùng số liệu dạng JSON |
+| `reports/cleaning/cleaning_run.log` | Log thời gian từng bảng |
+
+### 5. Tắt cụm
 ```bash
 docker compose down
 ```
