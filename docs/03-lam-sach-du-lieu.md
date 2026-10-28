@@ -166,7 +166,7 @@ Power BI, v.v.
 | **Broadcast join** | customers/sellers ⨝ geolocation; products ⨝ bảng dịch | Bảng nhỏ được gửi nguyên bản tới **mọi** executor, nên bảng lớn không phải shuffle qua mạng. Giống cache 1 bảng tra cứu nhỏ trong RAM của từng server. |
 | **Window function** | `most_frequent()`: tên thành phố phổ biến nhất mỗi zip; `dq_review_id_reused` | `ROW_NUMBER() OVER (PARTITION BY zip ORDER BY count DESC)`, giống SQL |
 | **`spark.sql.shuffle.partitions = 16`** | Cấu hình SparkSession | Mặc định 200 dành cho cụm lớn. Với 4 core, 200 task tí hon thì chi phí điều phối còn lớn hơn chi phí xử lý. |
-| **`repartition` trước `partitionBy`** | `write_silver()` cho orders | Nếu không làm, mỗi task ghi 1 file nhỏ vào **mọi** thư mục tháng, tạo ra hàng trăm file vài KB ("small files problem"). Sau khi repartition: đúng **25 file cho 25 tháng**. |
+| **`repartition` trước `partitionBy`** | `write_parquet()` trong `common.py` (orders) | Nếu không làm, mỗi task ghi 1 file nhỏ vào **mọi** thư mục tháng, tạo ra hàng trăm file vài KB ("small files problem"). Sau khi repartition: đúng **25 file cho 25 tháng**. |
 | **Ghi rồi đọc lại** | `silver[name] = spark.read.parquet(...)` | Bảng sau (customers) dùng geolocation **đã ghi** thay vì tính lại cả chuỗi biến đổi (lazy evaluation sẽ tính lại từ CSV nếu dùng DataFrame cũ). |
 | **Kiểm tra sau khi ghi** | `validate_silver()` | Đọc lại Parquet từ đĩa để chứng minh dữ liệu dùng được và khoá chính thật sự duy nhất. |
 | **`decimal(12,2)` cho tiền** | order_items, payments | `double` có lỗi làm tròn (0.1 + 0.2 = 0.30000000000000004); tiền phải dùng decimal, giống `DECIMAL` trong MySQL. |

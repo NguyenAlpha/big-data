@@ -1,18 +1,18 @@
-2026-10-28 03:02:35 | INFO | Spark 3.5.3 | master=spark://spark-master:7077 | executors=2 | parallelism=4
-2026-10-28 03:03:03 | INFO | Làm sạch geolocation  1,000,163 dòng vào | 19.91s
-2026-10-28 03:03:08 | INFO | Làm sạch customers       99,441 dòng vào | 4.82s
-2026-10-28 03:03:10 | INFO | Làm sạch sellers          3,095 dòng vào | 1.51s
-2026-10-28 03:03:12 | INFO | Làm sạch products        32,951 dòng vào | 2.82s
-2026-10-28 03:03:20 | INFO | Làm sạch orders          99,441 dòng vào | 7.91s
-2026-10-28 03:03:23 | INFO | Làm sạch order_items    112,650 dòng vào | 2.40s
-2026-10-28 03:03:25 | INFO | Làm sạch payments       103,886 dòng vào | 1.92s
-2026-10-28 03:03:32 | INFO | Làm sạch reviews         99,224 dòng vào | 4.45s
-2026-10-28 03:03:33 | INFO | Kiểm tra geolocation     19,010 dòng ra | trùng khoá=0 | 2 file | 0.50 MB
-2026-10-28 03:03:34 | INFO | Kiểm tra customers       99,441 dòng ra | trùng khoá=0 | 5 file | 7.82 MB
-2026-10-28 03:03:35 | INFO | Kiểm tra sellers          3,095 dòng ra | trùng khoá=0 | 1 file | 0.17 MB
-2026-10-28 03:03:36 | INFO | Kiểm tra products        32,951 dòng ra | trùng khoá=0 | 2 file | 1.32 MB
-2026-10-28 03:03:39 | INFO | Kiểm tra orders          99,441 dòng ra | trùng khoá=0 | 25 file | 9.98 MB
-2026-10-28 03:03:40 | INFO | Kiểm tra order_items    112,650 dòng ra | trùng khoá=0 | 5 file | 7.87 MB
-2026-10-28 03:03:41 | INFO | Kiểm tra payments       103,886 dòng ra | trùng khoá=0 | 4 file | 3.59 MB
-2026-10-28 03:03:42 | INFO | Kiểm tra reviews         99,224 dòng ra | trùng khoá=0 | 5 file | 9.12 MB
-2026-10-28 03:03:43 | INFO | Xong sau 70.07s. Báo cáo: reports/cleaning/cleaning_report.md
+2026-10-28 03:10:43 | INFO | Spark 3.5.3 | master=spark://spark-master:7077 | executors=2 | parallelism=4
+2026-10-28 03:11:03 | INFO | Làm sạch geolocation  1,000,163 dòng vào | 19.99s
+2026-10-28 03:11:19 | INFO | Làm sạch customers       99,441 dòng vào | 4.96s
+2026-10-28 03:11:21 | INFO | Làm sạch sellers          3,095 dòng vào | 1.68s
+2026-10-28 03:11:24 | INFO | Làm sạch products        32,951 dòng vào | 3.18s
+2026-10-28 03:11:33 | INFO | Làm sạch orders          99,441 dòng vào | 9.35s
+2026-10-28 03:11:36 | INFO | Làm sạch order_items    112,650 dòng vào | 2.80s
+2026-10-28 03:11:39 | INFO | Làm sạch payments       103,886 dòng vào | 2.30s
+2026-10-28 03:11:43 | INFO | Làm sạch reviews         99,224 dòng vào | 4.65s
+2026-10-28 03:11:44 | INFO | Kiểm tra geolocation     19,010 dòng ra | trùng khoá=0 | 2 file | 0.50 MB
+2026-10-28 03:11:45 | INFO | Kiểm tra customers       99,441 dòng ra | trùng khoá=0 | 5 file | 7.82 MB
+2026-10-28 03:11:46 | INFO | Kiểm tra sellers          3,095 dòng ra | trùng khoá=0 | 1 file | 0.17 MB
+2026-10-28 03:11:47 | INFO | Kiểm tra products        32,951 dòng ra | trùng khoá=0 | 2 file | 1.32 MB
+2026-10-28 03:11:50 | INFO | Kiểm tra orders          99,441 dòng ra | trùng khoá=0 | 25 file | 9.98 MB
+2026-10-28 03:11:51 | INFO | Kiểm tra order_items    112,650 dòng ra | trùng khoá=0 | 5 file | 7.87 MB
+2026-10-28 03:11:52 | INFO | Kiểm tra payments       103,886 dòng ra | trùng khoá=0 | 4 file | 3.59 MB
+2026-10-28 03:11:53 | INFO | Kiểm tra reviews         99,224 dòng ra | trùng khoá=0 | 5 file | 9.12 MB
+2026-10-28 03:11:53 | INFO | Xong sau 72.25s. Báo cáo: reports/cleaning/cleaning_report.md

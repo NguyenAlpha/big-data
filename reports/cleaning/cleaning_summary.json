@@ -1,6 +1,6 @@
 {
   "run": {
-    "started_at": "2026-10-28 03:02:29",
+    "started_at": "2026-10-28 03:10:37",
     "spark_version": "3.5.3",
     "master": "spark://spark-master:7077",
     "executors": 2,
@@ -9,9 +9,9 @@
     "silver_size_mb": 40.37,
     "rows_in": 1550922,
     "rows_out": 569698,
-    "clean_seconds": 46.3,
-    "validate_seconds": 10.05,
-    "total_seconds": 70.07
+    "clean_seconds": 49.53,
+    "validate_seconds": 9.64,
+    "total_seconds": 72.25
   },
   "tables": {
     "geolocation": {
@@ -43,7 +43,7 @@
           "rows": 738299
         }
       ],
-      "seconds": 19.91,
+      "seconds": 19.99,
       "validation": {
         "rows": 19010,
         "key_columns": [
@@ -88,20 +88,20 @@
         "size_mb": 0.5,
         "samples": [
           {
-            "zip_code_prefix": "12230",
-            "city": "sao jose dos campos",
+            "zip_code_prefix": "01004",
+            "city": "sao paulo",
             "state": "SP",
-            "lat": -23.22588,
-            "lng": -45.887548,
-            "n_points": 169
+            "lat": -23.549829,
+            "lng": -46.634792,
+            "n_points": 14
           },
           {
-            "zip_code_prefix": "12232",
-            "city": "sao jose dos campos",
+            "zip_code_prefix": "01036",
+            "city": "sao paulo",
             "state": "SP",
-            "lat": -23.25729,
-            "lng": -45.8876,
-            "n_points": 88
+            "lat": -23.541976,
+            "lng": -46.640842,
+            "n_points": 13
           }
         ]
       }
@@ -136,7 +136,7 @@
           "rows": 279
         }
       ],
-      "seconds": 4.82,
+      "seconds": 4.96,
       "validation": {
         "rows": 99441,
         "key_columns": [
@@ -243,7 +243,7 @@
           "rows": 7
         }
       ],
-      "seconds": 1.51,
+      "seconds": 1.68,
       "validation": {
         "rows": 3095,
         "key_columns": [
@@ -348,7 +348,7 @@
           "rows": 13
         }
       ],
-      "seconds": 2.82,
+      "seconds": 3.18,
       "validation": {
         "rows": 32951,
         "key_columns": [
@@ -504,7 +504,7 @@
           "rows": 1
         }
       ],
-      "seconds": 7.91,
+      "seconds": 9.35,
       "validation": {
         "rows": 99441,
         "key_columns": [
@@ -604,16 +604,16 @@
         "size_mb": 9.98,
         "samples": [
           {
-            "order_id": "0030d783f979fbc5981e75613b057344",
-            "customer_id": "84ddc138522822dfb51b603c2f466a18",
+            "order_id": "000e906b789b55f64edcb1f84030f90d",
+            "customer_id": "6a3b2fc9f270df258605e22bef19fd88",
             "order_status": "delivered",
-            "order_purchase_timestamp": "2017-11-24 20:03:02",
-            "order_approved_at": "2017-11-24 23:13:38",
-            "order_delivered_carrier_date": "2017-12-15 19:34:13",
-            "order_delivered_customer_date": "2018-01-06 00:25:43",
-            "order_estimated_delivery_date": "2017-12-15 00:00:00",
-            "delivery_days": 43,
-            "delivery_delay_days": 22,
+            "order_purchase_timestamp": "2017-11-21 18:54:23",
+            "order_approved_at": "2017-11-21 19:09:02",
+            "order_delivered_carrier_date": "2017-11-22 20:46:54",
+            "order_delivered_customer_date": "2017-12-09 17:27:23",
+            "order_estimated_delivery_date": "2017-12-07 00:00:00",
+            "delivery_days": 18,
+            "delivery_delay_days": 2,
             "is_late": true,
             "dq_delivered_without_date": false,
             "dq_carrier_before_purchase": false,
@@ -623,16 +623,16 @@
             "purchase_month": 11
           },
           {
-            "order_id": "0035c0b07126fe9c24a325216fb96064",
-            "customer_id": "c8c4991d84dbfef1f61c6152486db6d4",
+            "order_id": "0020262c8a370bd5a174ea6a2a267321",
+            "customer_id": "9ec353f970bdf785f6568724d9ea19aa",
             "order_status": "delivered",
-            "order_purchase_timestamp": "2017-11-24 01:08:37",
-            "order_approved_at": "2017-11-24 01:29:45",
-            "order_delivered_carrier_date": "2017-11-28 17:17:17",
-            "order_delivered_customer_date": "2017-12-07 16:59:21",
-            "order_estimated_delivery_date": "2018-01-03 00:00:00",
-            "delivery_days": 13,
-            "delivery_delay_days": -27,
+            "order_purchase_timestamp": "2017-11-28 09:32:49",
+            "order_approved_at": "2017-11-28 09:58:07",
+            "order_delivered_carrier_date": "2017-11-29 00:09:20",
+            "order_delivered_customer_date": "2017-12-02 12:27:33",
+            "order_estimated_delivery_date": "2017-12-22 00:00:00",
+            "delivery_days": 4,
+            "delivery_delay_days": -20,
             "is_late": false,
             "dq_delivered_without_date": false,
             "dq_carrier_before_purchase": false,
@@ -668,7 +668,7 @@
           "rows": null
         }
       ],
-      "seconds": 2.4,
+      "seconds": 2.8,
       "validation": {
         "rows": 112650,
         "key_columns": [
@@ -780,7 +780,7 @@
           "rows": 9
         }
       ],
-      "seconds": 1.92,
+      "seconds": 2.3,
       "validation": {
         "rows": 103886,
         "key_columns": [
@@ -887,7 +887,7 @@
           "rows": 1603
         }
       ],
-      "seconds": 4.45,
+      "seconds": 4.65,
       "validation": {
         "rows": 99224,
         "key_columns": [

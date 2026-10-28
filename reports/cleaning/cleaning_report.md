@@ -6,27 +6,27 @@
 
 | Thuộc tính | Giá trị |
 |---|---|
-| Thời điểm chạy | 2026-10-28 03:02:29 |
+| Thời điểm chạy | 2026-10-28 03:10:37 |
 | Spark master | spark://spark-master:7077 (2 executor, 4 core) |
 | Dung lượng CSV gốc | 120.35 MB |
 | Dung lượng Parquet silver | 40.37 MB |
 | Số dòng đầu vào / đầu ra | 1,550,922 / 569,698 |
-| Thời gian làm sạch + ghi | 46.3 s |
-| Thời gian kiểm tra lại | 10.05 s |
-| Tổng thời gian | 70.07 s |
+| Thời gian làm sạch + ghi | 49.53 s |
+| Thời gian kiểm tra lại | 9.64 s |
+| Tổng thời gian | 72.25 s |
 
 ## 2. Tổng quan trước / sau
 
 | Bảng silver | Nguồn CSV | Dòng trước | Dòng sau | Cột trước → sau | CSV (MB) | Parquet (MB) | Số file | Trùng khoá sau | Thời gian (s) |
 |---|---|---:|---:|---|---:|---:|---:|---:|---:|
-| geolocation | `olist_geolocation_dataset.csv` | 1,000,163 | 19,010 | 5 → 6 | 58.44 | 0.5 | 2 | 0 | 19.91 |
-| customers | `olist_customers_dataset.csv` + `olist_geolocation_dataset.csv` | 99,441 | 99,441 | 5 → 8 | 8.62 | 7.82 | 5 | 0 | 4.82 |
-| sellers | `olist_sellers_dataset.csv` + `olist_geolocation_dataset.csv` | 3,095 | 3,095 | 4 → 7 | 0.17 | 0.17 | 1 | 0 | 1.51 |
-| products | `olist_products_dataset.csv` + `product_category_name_translation.csv` | 32,951 | 32,951 | 9 → 13 | 2.27 | 1.32 | 2 | 0 | 2.82 |
-| orders | `olist_orders_dataset.csv` | 99,441 | 99,441 | 8 → 17 | 16.84 | 9.98 | 25 | 0 | 7.91 |
-| order_items | `olist_order_items_dataset.csv` | 112,650 | 112,650 | 7 → 8 | 14.72 | 7.87 | 5 | 0 | 2.4 |
-| payments | `olist_order_payments_dataset.csv` | 103,886 | 103,886 | 5 → 8 | 5.51 | 3.59 | 4 | 0 | 1.92 |
-| reviews | `olist_order_reviews_dataset.csv` | 99,224 | 99,224 | 7 → 9 | 13.78 | 9.12 | 5 | 0 | 4.45 |
+| geolocation | `olist_geolocation_dataset.csv` | 1,000,163 | 19,010 | 5 → 6 | 58.44 | 0.5 | 2 | 0 | 19.99 |
+| customers | `olist_customers_dataset.csv` + `olist_geolocation_dataset.csv` | 99,441 | 99,441 | 5 → 8 | 8.62 | 7.82 | 5 | 0 | 4.96 |
+| sellers | `olist_sellers_dataset.csv` + `olist_geolocation_dataset.csv` | 3,095 | 3,095 | 4 → 7 | 0.17 | 0.17 | 1 | 0 | 1.68 |
+| products | `olist_products_dataset.csv` + `product_category_name_translation.csv` | 32,951 | 32,951 | 9 → 13 | 2.27 | 1.32 | 2 | 0 | 3.18 |
+| orders | `olist_orders_dataset.csv` | 99,441 | 99,441 | 8 → 17 | 16.84 | 9.98 | 25 | 0 | 9.35 |
+| order_items | `olist_order_items_dataset.csv` | 112,650 | 112,650 | 7 → 8 | 14.72 | 7.87 | 5 | 0 | 2.8 |
+| payments | `olist_order_payments_dataset.csv` | 103,886 | 103,886 | 5 → 8 | 5.51 | 3.59 | 4 | 0 | 2.3 |
+| reviews | `olist_order_reviews_dataset.csv` | 99,224 | 99,224 | 7 → 9 | 13.78 | 9.12 | 5 | 0 | 4.65 |
 
 ## 3. Các thao tác đã áp dụng
 
@@ -125,8 +125,8 @@ Cột *Số dòng*: số dòng bị tác động; `-` = áp dụng cho toàn b�
 
 | `zip_code_prefix` | `city` | `state` | `lat` | `lng` | `n_points` |
 |---|---|---|---|---|---|
-| 12230 | sao jose dos campos | SP | -23.22588 | -45.887548 | 169 |
-| 12232 | sao jose dos campos | SP | -23.25729 | -45.8876 | 88 |
+| 01004 | sao paulo | SP | -23.549829 | -46.634792 | 14 |
+| 01036 | sao paulo | SP | -23.541976 | -46.640842 | 13 |
 
 ### `customers` (99,441 dòng, khoá: `customer_id`)
 
@@ -218,8 +218,8 @@ Cột *Số dòng*: số dòng bị tác động; `-` = áp dụng cho toàn b�
 
 | `order_id` | `customer_id` | `order_status` | `order_purchase_timestamp` | `order_approved_at` | `order_delivered_carrier_date` | `order_delivered_customer_date` | `order_estimated_delivery_date` | `delivery_days` | `delivery_delay_days` | `is_late` | `dq_delivered_without_date` | `dq_carrier_before_purchase` | `dq_no_items` | `dq_no_payment` | `purchase_year` | `purchase_month` |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 0030d783f979fbc5981… | 84ddc138522822dfb51… | delivered | 2017-11-24 20:03:02 | 2017-11-24 23:13:38 | 2017-12-15 19:34:13 | 2018-01-06 00:25:43 | 2017-12-15 00:00:00 | 43 | 22 | True | False | False | False | False | 2017 | 11 |
-| 0035c0b07126fe9c24a… | c8c4991d84dbfef1f61… | delivered | 2017-11-24 01:08:37 | 2017-11-24 01:29:45 | 2017-11-28 17:17:17 | 2017-12-07 16:59:21 | 2018-01-03 00:00:00 | 13 | -27 | False | False | False | False | False | 2017 | 11 |
+| 000e906b789b55f64ed… | 6a3b2fc9f270df25860… | delivered | 2017-11-21 18:54:23 | 2017-11-21 19:09:02 | 2017-11-22 20:46:54 | 2017-12-09 17:27:23 | 2017-12-07 00:00:00 | 18 | 2 | True | False | False | False | False | 2017 | 11 |
+| 0020262c8a370bd5a17… | 9ec353f970bdf785f65… | delivered | 2017-11-28 09:32:49 | 2017-11-28 09:58:07 | 2017-11-29 00:09:20 | 2017-12-02 12:27:33 | 2017-12-22 00:00:00 | 4 | -20 | False | False | False | False | False | 2017 | 11 |
 
 ### `order_items` (112,650 dòng, khoá: `order_id, order_item_id`)
 

@@ -50,8 +50,8 @@ from pyspark.sql import SparkSession, Window
 from pyspark.sql import functions as F
 from pyspark.sql.types import DecimalType
 
-from common import (Timer, dir_size_mb, fmt, md_cell, normalize_text, read_raw_csv,
-                    setup_logger, wait_for_executors)
+from common import (Timer, dir_size_mb, fmt, md_cell, normalize_text, parquet_files,
+                    read_raw_csv, setup_logger, wait_for_executors, write_parquet)
 from olist_tables import BRAZIL_LAT, BRAZIL_LNG, REPORT_DIR, SILVER_DIR, TABLES
 
 OUT_DIR = os.path.join(REPORT_DIR, "cleaning")
@@ -413,24 +413,8 @@ def clean_reviews(raw):
 # Ghi & kiểm tra lại
 # =============================================================================
 def write_silver(df, name):
-    """
-    Ghi Parquet. Spark ghi thành 1 THƯ MỤC chứa nhiều file part-xxxx.parquet
-    (mỗi partition 1 file, các executor ghi song song).
-
-    Với orders: partitionBy("purchase_year", "purchase_month") tạo cấu trúc
-        orders/purchase_year=2017/purchase_month=10/part-....parquet
-    Truy vấn `WHERE purchase_year = 2018` chỉ đọc thư mục 2018 (partition pruning),
-    giống index theo ngày trong database.
-    Trước khi ghi, repartition theo đúng các cột đó để mỗi tháng chỉ có 1 file;
-    nếu không, mỗi task sẽ ghi 1 file nhỏ vào MỌI thư mục tháng ("small files problem").
-    """
-    path = os.path.join(SILVER_DIR, name)
-    cols = PARTITION_BY.get(name)
-    writer = (df.repartition(*cols) if cols else df).write.mode("overwrite")
-    if cols:
-        writer = writer.partitionBy(*cols)
-    writer.parquet(path)
-    return path
+    """Ghi 1 bảng silver ra Parquet (orders chia thư mục theo năm/tháng - xem common.write_parquet)."""
+    return write_parquet(df, os.path.join(SILVER_DIR, name), PARTITION_BY.get(name))
 
 
 def validate_silver(spark, name, path):
@@ -441,7 +425,7 @@ def validate_silver(spark, name, path):
     key_dups = rows - df.select(*keys).distinct().count()
     null_exprs = [F.sum(F.when(F.col(c).isNull(), 1).otherwise(0)).alias(c) for c in df.columns]
     nulls = df.agg(*null_exprs).collect()[0].asDict()
-    files = sum(1 for _, _, fs in os.walk(path) for f in fs if f.endswith(".parquet"))
+    files = parquet_files(path)
     return {
         "rows": rows,
         "key_columns": keys,

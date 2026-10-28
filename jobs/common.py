@@ -101,6 +101,35 @@ def read_raw_csv(spark, file_name, multiline=False):
     return df, path, issues
 
 
+def write_parquet(df, path, partition_cols=None, single_file=False):
+    """
+    Ghi DataFrame ra Parquet (ghi đè). Spark ghi thành 1 THƯ MỤC chứa nhiều file
+    part-xxxx.parquet (mỗi partition 1 file, các executor ghi song song).
+
+    partition_cols: vd ["purchase_year", "purchase_month"] tạo cấu trúc
+        <path>/purchase_year=2017/purchase_month=10/part-....parquet
+      Truy vấn `WHERE purchase_year = 2018` chỉ đọc thư mục 2018 (partition
+      pruning), giống index theo ngày trong database. Trước khi ghi ta
+      repartition theo đúng các cột đó để mỗi thư mục chỉ có 1 file; nếu không,
+      mỗi task ghi 1 file nhỏ vào MỌI thư mục ("small files problem").
+    single_file: gộp về 1 file - dùng cho bảng tổng hợp nhỏ (vài nghìn dòng),
+      để công cụ BI đọc cho tiện. KHÔNG dùng cho bảng lớn vì dồn hết vào 1 task.
+    """
+    if partition_cols:
+        df.repartition(*partition_cols).write.mode("overwrite") \
+            .partitionBy(*partition_cols).parquet(path)
+    elif single_file:
+        df.coalesce(1).write.mode("overwrite").parquet(path)
+    else:
+        df.write.mode("overwrite").parquet(path)
+    return path
+
+
+def parquet_files(path):
+    """Số file .parquet trong thư mục (đệ quy)."""
+    return sum(1 for _, _, fs in os.walk(path) for f in fs if f.endswith(".parquet"))
+
+
 def normalize_text(col):
     """
     Chuẩn hoá tên địa danh: "  São  Paulo " -> "sao paulo".
