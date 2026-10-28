@@ -23,3 +23,6 @@ Thumbs.db
 
 # Log chi tiết từng lần chạy thực nghiệm (rất nhiều file) - số liệu đã gom vào results.csv
 reports/experiments/runs/
+
+# File zip bàn giao (sinh bởi scripts/package_handover.py)
+dist/

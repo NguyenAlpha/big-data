@@ -6,25 +6,25 @@
 
 | Thuộc tính | Giá trị |
 |---|---|
-| Thời điểm chạy | 2026-10-28 03:13:23 |
+| Thời điểm chạy | 2026-10-28 08:08:47 |
 | Spark master | spark://spark-master:7077 (2 executor, 4 core) |
 | Dữ liệu vào (silver) | 569,698 dòng, 40.37 MB |
 | Dữ liệu ra (gold) | 7 bảng, 33.3 MB |
-| Thời gian tạo bảng | 36.21 s |
-| Thời gian đối chiếu số liệu | 6.92 s |
-| Tổng thời gian | 60.11 s |
+| Thời gian tạo bảng | 35.94 s |
+| Thời gian đối chiếu số liệu | 7.34 s |
+| Tổng thời gian | 61.72 s |
 
 ## 2. Các bảng gold
 
 | Bảng | Loại | 1 dòng = | Số dòng | Số cột | Parquet (MB) | Số file | Broadcast join | Sort-merge join | Thời gian (s) |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| `fact_order_items` | fact | 1 sản phẩm trong 1 đơn hàng | 112,650 | 27 | 16.27 | 24 | 6 | 0 | 12.92 |
-| `fact_orders` | fact | 1 đơn hàng | 99,441 | 29 | 12.66 | 25 | 4 | 0 | 9.68 |
-| `agg_sales_monthly` | agg | 1 tháng | 24 | 12 | 0.0 | 1 | 0 | 0 | 2.79 |
-| `agg_category_monthly` | agg | 1 danh mục x 1 tháng | 1,282 | 9 | 0.03 | 1 | 0 | 0 | 2.0 |
-| `agg_customer_state` | agg | 1 bang của khách hàng | 27 | 11 | 0.0 | 1 | 0 | 0 | 1.99 |
-| `agg_seller_performance` | agg | 1 người bán | 3,053 | 15 | 0.19 | 1 | 0 | 0 | 3.57 |
-| `agg_customer_rfm` | agg | 1 khách hàng thật | 94,983 | 9 | 4.15 | 1 | 0 | 0 | 2.5 |
+| `fact_order_items` | fact | 1 sản phẩm trong 1 đơn hàng | 112,650 | 27 | 16.27 | 24 | 6 | 0 | 13.01 |
+| `fact_orders` | fact | 1 đơn hàng | 99,441 | 29 | 12.66 | 25 | 4 | 0 | 9.42 |
+| `agg_sales_monthly` | agg | 1 tháng | 24 | 12 | 0.0 | 1 | 0 | 0 | 2.35 |
+| `agg_category_monthly` | agg | 1 danh mục x 1 tháng | 1,282 | 9 | 0.03 | 1 | 0 | 0 | 2.05 |
+| `agg_customer_state` | agg | 1 bang của khách hàng | 27 | 11 | 0.0 | 1 | 0 | 0 | 2.05 |
+| `agg_seller_performance` | agg | 1 người bán | 3,053 | 15 | 0.19 | 1 | 0 | 0 | 3.64 |
+| `agg_customer_rfm` | agg | 1 khách hàng thật | 94,983 | 9 | 4.15 | 1 | 0 | 0 | 2.63 |
 
 ## 3. Đối chiếu số liệu (reconciliation)
 

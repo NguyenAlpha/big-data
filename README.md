@@ -44,6 +44,8 @@ bằng **Apache Spark (PySpark)** chạy trên cụm Spark Standalone dựng b�
 │   ├── gold/                 # Kết quả bước 5 (báo cáo, đối chiếu, execution plan)
 │   └── experiments/          # Kết quả bước 6 (results.csv/.md, biểu đồ, execution plan)
 ├── experiments/              # Bước 6: script chạy thực nghiệm và vẽ biểu đồ (chạy trên máy thật)
+├── scripts/package_handover.py  # Đóng gói gold + tài liệu thành file zip gửi nhóm sau
+├── HANDOVER.md               # Tài liệu bàn giao cho nhóm Analytics
 └── docs/                     # Tài liệu giải thích từng bước
 ```
 
@@ -134,7 +136,16 @@ pip install matplotlib && python experiments/plot_results.py   # vẽ biểu đ�
 Kết quả: `reports/experiments/results.md` (bảng tổng hợp), `results.csv` (từng lần chạy),
 `fig_e1_scale.png`, `fig_e2_cores.png`. Nếu bị ngắt giữa chừng, chạy lại lệnh trên để chạy tiếp.
 
-### 7. Tắt cụm
+### 7. Đóng gói bàn giao cho nhóm Analytics
+Sau khi chạy bước 4 và 5:
+```bash
+python scripts/package_handover.py
+```
+Tạo `dist/olist_gold_handover_<ngày>.zip` (khoảng 33 MB) gồm 7 bảng gold (Parquet),
+[HANDOVER.md](HANDOVER.md) (tài liệu bàn giao), `SCHEMA.md`, `gold_report.md` và
+`MANIFEST.json`. Script từ chối đóng gói nếu có kiểm tra đối chiếu số liệu bị sai.
+
+### 8. Tắt cụm
 ```bash
 docker compose down
 ```
