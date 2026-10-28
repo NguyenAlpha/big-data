@@ -1,0 +1,74 @@
+# =============================================================================
+# Cụm Spark Standalone chạy bằng Docker: 1 master + 2 worker
+# -----------------------------------------------------------------------------
+# Hình dung theo kiểu web:
+#   - spark-master  ~ "load balancer / orchestrator": không tự xử lý dữ liệu,
+#                     chỉ nhận job, chia việc và theo dõi các worker.
+#   - spark-worker-N ~ các "backend instance": nơi code xử lý dữ liệu thật sự chạy
+#                     (Spark gọi tiến trình chạy trên worker là "executor").
+#   - Driver        ~ "client" gửi job lên cụm. Ở đây ta chạy driver bên trong
+#                     container spark-master bằng lệnh spark-submit.
+#
+# Chạy cụm:   docker compose up -d
+# Tắt cụm:    docker compose down
+# Xem chi tiết: docs/01-moi-truong-spark.md
+# =============================================================================
+
+# Cấu hình dùng chung cho cả 3 container (YAML anchor, giống "biến" trong YAML)
+x-spark-common: &spark-common
+  image: apache/spark:3.5.3-python3   # Image chính thức của Apache Spark (Java 11 + Python 3.8)
+  volumes:
+    # Mọi node (master + worker) phải thấy dữ liệu ở CÙNG một đường dẫn,
+    # vì executor trên worker sẽ tự đọc file chứ không đi qua master.
+    # Trong thực tế chỗ này là HDFS / S3 / MinIO; ở đây ta giả lập bằng thư mục chia sẻ.
+    - ./dataset:/data/raw:ro          # Dữ liệu gốc (CSV) - chỉ đọc, không cho job sửa
+    - ./data:/data/lake               # Nơi ghi dữ liệu đã xử lý (silver/gold) ở các bước sau
+    - ./jobs:/opt/jobs                # Code PySpark
+    - ./reports:/opt/reports          # Báo cáo, log, số liệu đo
+  networks:
+    - spark-net
+
+services:
+  spark-master:
+    <<: *spark-common
+    container_name: spark-master
+    hostname: spark-master
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    environment:
+      - SPARK_NO_DAEMONIZE=true       # Chạy foreground để Docker giữ container sống
+    ports:
+      - "8080:8080"   # Web UI của master: xem worker nào đang sống, job nào đang chạy
+      - "7077:7077"   # Cổng worker/driver kết nối tới master (giao thức nội bộ của Spark)
+      - "4040:4040"   # Web UI của từng job (chỉ mở khi job đang chạy): xem DAG, stage, task
+
+  spark-worker-1:
+    <<: *spark-common
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    environment:
+      - SPARK_NO_DAEMONIZE=true
+      - SPARK_WORKER_CORES=2          # Worker này cho phép chạy song song tối đa 2 task
+      - SPARK_WORKER_MEMORY=2g        # RAM tối đa worker cấp cho executor
+    ports:
+      - "8081:8081"   # Web UI của worker 1
+    depends_on:
+      - spark-master
+
+  spark-worker-2:
+    <<: *spark-common
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    environment:
+      - SPARK_NO_DAEMONIZE=true
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2g
+    ports:
+      - "8082:8081"   # Web UI của worker 2 (map ra 8082 để không trùng worker 1)
+    depends_on:
+      - spark-master
+
+networks:
+  spark-net:
+    driver: bridge

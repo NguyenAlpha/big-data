@@ -1,0 +1,22 @@
+# Dữ liệu gốc (~120 MB) không đưa lên git - tải từ Kaggle, xem README.md
+dataset/*.csv
+
+# Dữ liệu sinh ra bởi các job (silver/gold) - chạy lại job để tạo
+data/*
+!data/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Spark
+spark-warehouse/
+metastore_db/
+derby.log
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
