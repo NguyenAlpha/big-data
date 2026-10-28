@@ -1,0 +1,78 @@
+== Physical Plan ==
+AdaptiveSparkPlan (12)
++- Sort (11)
+   +- Exchange (10)
+      +- HashAggregate (9)
+         +- Exchange (8)
+            +- HashAggregate (7)
+               +- HashAggregate (6)
+                  +- Exchange (5)
+                     +- HashAggregate (4)
+                        +- Project (3)
+                           +- Filter (2)
+                              +- Scan parquet  (1)
+
+
+(1) Scan parquet 
+Output [8]: [order_id#367, is_valid_sale#374, category#377, price#378, freight_value#379, review_score#389, purchase_year#392, purchase_month#393]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/gold/fact_order_items]
+PushedFilters: [IsNotNull(is_valid_sale), EqualTo(is_valid_sale,true)]
+ReadSchema: struct<order_id:string,is_valid_sale:boolean,category:string,price:decimal(12,2),freight_value:decimal(12,2),review_score:int>
+
+(2) Filter
+Input [8]: [order_id#367, is_valid_sale#374, category#377, price#378, freight_value#379, review_score#389, purchase_year#392, purchase_month#393]
+Condition : (isnotnull(is_valid_sale#374) AND is_valid_sale#374)
+
+(3) Project
+Output [7]: [order_id#367, category#377, price#378, freight_value#379, review_score#389, purchase_year#392, purchase_month#393]
+Input [8]: [order_id#367, is_valid_sale#374, category#377, price#378, freight_value#379, review_score#389, purchase_year#392, purchase_month#393]
+
+(4) HashAggregate
+Input [7]: [order_id#367, category#377, price#378, freight_value#379, review_score#389, purchase_year#392, purchase_month#393]
+Keys [4]: [purchase_year#392, purchase_month#393, category#377, order_id#367]
+Functions [5]: [partial_count(1), partial_sum(price#378), partial_sum(freight_value#379), partial_avg(price#378), partial_avg(review_score#389)]
+Aggregate Attributes [5]: [count(1)#954L, sum(price#378)#955, sum(freight_value#379)#956, avg(price#378)#957, avg(review_score#389)#958]
+Results [13]: [purchase_year#392, purchase_month#393, category#377, order_id#367, count#969L, sum#972, isEmpty#973, sum#976, isEmpty#977, sum#980, count#981L, sum#984, count#985L]
+
+(5) Exchange
+Input [13]: [purchase_year#392, purchase_month#393, category#377, order_id#367, count#969L, sum#972, isEmpty#973, sum#976, isEmpty#977, sum#980, count#981L, sum#984, count#985L]
+Arguments: hashpartitioning(purchase_year#392, purchase_month#393, category#377, order_id#367, 16), ENSURE_REQUIREMENTS, [plan_id=3789]
+
+(6) HashAggregate
+Input [13]: [purchase_year#392, purchase_month#393, category#377, order_id#367, count#969L, sum#972, isEmpty#973, sum#976, isEmpty#977, sum#980, count#981L, sum#984, count#985L]
+Keys [4]: [purchase_year#392, purchase_month#393, category#377, order_id#367]
+Functions [5]: [merge_count(1), merge_sum(price#378), merge_sum(freight_value#379), merge_avg(price#378), merge_avg(review_score#389)]
+Aggregate Attributes [5]: [count(1)#954L, sum(price#378)#955, sum(freight_value#379)#956, avg(price#378)#957, avg(review_score#389)#958]
+Results [13]: [purchase_year#392, purchase_month#393, category#377, order_id#367, count#969L, sum#972, isEmpty#973, sum#976, isEmpty#977, sum#980, count#981L, sum#984, count#985L]
+
+(7) HashAggregate
+Input [13]: [purchase_year#392, purchase_month#393, category#377, order_id#367, count#969L, sum#972, isEmpty#973, sum#976, isEmpty#977, sum#980, count#981L, sum#984, count#985L]
+Keys [3]: [purchase_year#392, purchase_month#393, category#377]
+Functions [6]: [merge_count(1), merge_sum(price#378), merge_sum(freight_value#379), merge_avg(price#378), merge_avg(review_score#389), partial_count(distinct order_id#367)]
+Aggregate Attributes [6]: [count(1)#954L, sum(price#378)#955, sum(freight_value#379)#956, avg(price#378)#957, avg(review_score#389)#958, count(order_id#367)#953L]
+Results [13]: [purchase_year#392, purchase_month#393, category#377, count#969L, sum#972, isEmpty#973, sum#976, isEmpty#977, sum#980, count#981L, sum#984, count#985L, count#988L]
+
+(8) Exchange
+Input [13]: [purchase_year#392, purchase_month#393, category#377, count#969L, sum#972, isEmpty#973, sum#976, isEmpty#977, sum#980, count#981L, sum#984, count#985L, count#988L]
+Arguments: hashpartitioning(purchase_year#392, purchase_month#393, category#377, 16), ENSURE_REQUIREMENTS, [plan_id=3793]
+
+(9) HashAggregate
+Input [13]: [purchase_year#392, purchase_month#393, category#377, count#969L, sum#972, isEmpty#973, sum#976, isEmpty#977, sum#980, count#981L, sum#984, count#985L, count#988L]
+Keys [3]: [purchase_year#392, purchase_month#393, category#377]
+Functions [6]: [count(1), sum(price#378), sum(freight_value#379), avg(price#378), avg(review_score#389), count(distinct order_id#367)]
+Aggregate Attributes [6]: [count(1)#954L, sum(price#378)#955, sum(freight_value#379)#956, avg(price#378)#957, avg(review_score#389)#958, count(order_id#367)#953L]
+Results [9]: [purchase_year#392, purchase_month#393, category#377, count(order_id#367)#953L AS orders#947L, count(1)#954L AS items#948L, sum(price#378)#955 AS revenue#949, sum(freight_value#379)#956 AS freight#950, round(avg(price#378)#957, 2) AS avg_price#951, round(avg(review_score#389)#958, 2) AS avg_review_score#952]
+
+(10) Exchange
+Input [9]: [purchase_year#392, purchase_month#393, category#377, orders#947L, items#948L, revenue#949, freight#950, avg_price#951, avg_review_score#952]
+Arguments: rangepartitioning(purchase_year#392 ASC NULLS FIRST, purchase_month#393 ASC NULLS FIRST, revenue#949 DESC NULLS LAST, 16), ENSURE_REQUIREMENTS, [plan_id=3796]
+
+(11) Sort
+Input [9]: [purchase_year#392, purchase_month#393, category#377, orders#947L, items#948L, revenue#949, freight#950, avg_price#951, avg_review_score#952]
+Arguments: [purchase_year#392 ASC NULLS FIRST, purchase_month#393 ASC NULLS FIRST, revenue#949 DESC NULLS LAST], true, 0
+
+(12) AdaptiveSparkPlan
+Output [9]: [purchase_year#392, purchase_month#393, category#377, orders#947L, items#948L, revenue#949, freight#950, avg_price#951, avg_review_score#952]
+Arguments: isFinalPlan=false
+

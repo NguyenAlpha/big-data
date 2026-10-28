@@ -1,0 +1,78 @@
+== Physical Plan ==
+AdaptiveSparkPlan (12)
++- Sort (11)
+   +- Exchange (10)
+      +- HashAggregate (9)
+         +- Exchange (8)
+            +- HashAggregate (7)
+               +- HashAggregate (6)
+                  +- Exchange (5)
+                     +- HashAggregate (4)
+                        +- Project (3)
+                           +- Filter (2)
+                              +- Scan parquet  (1)
+
+
+(1) Scan parquet 
+Output [11]: [customer_unique_id#609, is_valid_sale#611, items#616L, items_value#618, freight_value#619, order_value#620, delivery_days#625, is_late#627, review_score#628, purchase_year#634, purchase_month#635]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/gold/fact_orders]
+PushedFilters: [IsNotNull(is_valid_sale), EqualTo(is_valid_sale,true)]
+ReadSchema: struct<customer_unique_id:string,is_valid_sale:boolean,items:bigint,items_value:decimal(22,2),freight_value:decimal(22,2),order_value:decimal(23,2),delivery_days:int,is_late:boolean,review_score:int>
+
+(2) Filter
+Input [11]: [customer_unique_id#609, is_valid_sale#611, items#616L, items_value#618, freight_value#619, order_value#620, delivery_days#625, is_late#627, review_score#628, purchase_year#634, purchase_month#635]
+Condition : (isnotnull(is_valid_sale#611) AND is_valid_sale#611)
+
+(3) Project
+Output [10]: [customer_unique_id#609, items#616L, items_value#618, freight_value#619, order_value#620, delivery_days#625, is_late#627, review_score#628, purchase_year#634, purchase_month#635]
+Input [11]: [customer_unique_id#609, is_valid_sale#611, items#616L, items_value#618, freight_value#619, order_value#620, delivery_days#625, is_late#627, review_score#628, purchase_year#634, purchase_month#635]
+
+(4) HashAggregate
+Input [10]: [customer_unique_id#609, items#616L, items_value#618, freight_value#619, order_value#620, delivery_days#625, is_late#627, review_score#628, purchase_year#634, purchase_month#635]
+Keys [3]: [purchase_year#634, purchase_month#635, customer_unique_id#609]
+Functions [9]: [partial_count(1), partial_sum(items#616L), partial_sum(items_value#618), partial_sum(freight_value#619), partial_sum(order_value#620), partial_avg(order_value#620), partial_avg(review_score#628), partial_avg(delivery_days#625), partial_avg(cast(is_late#627 as int))]
+Aggregate Attributes [9]: [count(1)#709L, sum(items#616L)#711L, sum(items_value#618)#712, sum(freight_value#619)#713, sum(order_value#620)#714, avg(order_value#620)#715, avg(review_score#628)#716, avg(delivery_days#625)#717, avg(cast(is_late#627 as int))#718]
+Results [19]: [purchase_year#634, purchase_month#635, customer_unique_id#609, count#732L, sum#734L, sum#737, isEmpty#738, sum#741, isEmpty#742, sum#745, isEmpty#746, sum#749, count#750L, sum#753, count#754L, sum#757, count#758L, sum#761, count#762L]
+
+(5) Exchange
+Input [19]: [purchase_year#634, purchase_month#635, customer_unique_id#609, count#732L, sum#734L, sum#737, isEmpty#738, sum#741, isEmpty#742, sum#745, isEmpty#746, sum#749, count#750L, sum#753, count#754L, sum#757, count#758L, sum#761, count#762L]
+Arguments: hashpartitioning(purchase_year#634, purchase_month#635, customer_unique_id#609, 16), ENSURE_REQUIREMENTS, [plan_id=3497]
+
+(6) HashAggregate
+Input [19]: [purchase_year#634, purchase_month#635, customer_unique_id#609, count#732L, sum#734L, sum#737, isEmpty#738, sum#741, isEmpty#742, sum#745, isEmpty#746, sum#749, count#750L, sum#753, count#754L, sum#757, count#758L, sum#761, count#762L]
+Keys [3]: [purchase_year#634, purchase_month#635, customer_unique_id#609]
+Functions [9]: [merge_count(1), merge_sum(items#616L), merge_sum(items_value#618), merge_sum(freight_value#619), merge_sum(order_value#620), merge_avg(order_value#620), merge_avg(review_score#628), merge_avg(delivery_days#625), merge_avg(cast(is_late#627 as int))]
+Aggregate Attributes [9]: [count(1)#709L, sum(items#616L)#711L, sum(items_value#618)#712, sum(freight_value#619)#713, sum(order_value#620)#714, avg(order_value#620)#715, avg(review_score#628)#716, avg(delivery_days#625)#717, avg(cast(is_late#627 as int))#718]
+Results [19]: [purchase_year#634, purchase_month#635, customer_unique_id#609, count#732L, sum#734L, sum#737, isEmpty#738, sum#741, isEmpty#742, sum#745, isEmpty#746, sum#749, count#750L, sum#753, count#754L, sum#757, count#758L, sum#761, count#762L]
+
+(7) HashAggregate
+Input [19]: [purchase_year#634, purchase_month#635, customer_unique_id#609, count#732L, sum#734L, sum#737, isEmpty#738, sum#741, isEmpty#742, sum#745, isEmpty#746, sum#749, count#750L, sum#753, count#754L, sum#757, count#758L, sum#761, count#762L]
+Keys [2]: [purchase_year#634, purchase_month#635]
+Functions [10]: [merge_count(1), merge_sum(items#616L), merge_sum(items_value#618), merge_sum(freight_value#619), merge_sum(order_value#620), merge_avg(order_value#620), merge_avg(review_score#628), merge_avg(delivery_days#625), merge_avg(cast(is_late#627 as int)), partial_count(distinct customer_unique_id#609)]
+Aggregate Attributes [10]: [count(1)#709L, sum(items#616L)#711L, sum(items_value#618)#712, sum(freight_value#619)#713, sum(order_value#620)#714, avg(order_value#620)#715, avg(review_score#628)#716, avg(delivery_days#625)#717, avg(cast(is_late#627 as int))#718, count(customer_unique_id#609)#710L]
+Results [19]: [purchase_year#634, purchase_month#635, count#732L, sum#734L, sum#737, isEmpty#738, sum#741, isEmpty#742, sum#745, isEmpty#746, sum#749, count#750L, sum#753, count#754L, sum#757, count#758L, sum#761, count#762L, count#765L]
+
+(8) Exchange
+Input [19]: [purchase_year#634, purchase_month#635, count#732L, sum#734L, sum#737, isEmpty#738, sum#741, isEmpty#742, sum#745, isEmpty#746, sum#749, count#750L, sum#753, count#754L, sum#757, count#758L, sum#761, count#762L, count#765L]
+Arguments: hashpartitioning(purchase_year#634, purchase_month#635, 16), ENSURE_REQUIREMENTS, [plan_id=3501]
+
+(9) HashAggregate
+Input [19]: [purchase_year#634, purchase_month#635, count#732L, sum#734L, sum#737, isEmpty#738, sum#741, isEmpty#742, sum#745, isEmpty#746, sum#749, count#750L, sum#753, count#754L, sum#757, count#758L, sum#761, count#762L, count#765L]
+Keys [2]: [purchase_year#634, purchase_month#635]
+Functions [10]: [count(1), sum(items#616L), sum(items_value#618), sum(freight_value#619), sum(order_value#620), avg(order_value#620), avg(review_score#628), avg(delivery_days#625), avg(cast(is_late#627 as int)), count(distinct customer_unique_id#609)]
+Aggregate Attributes [10]: [count(1)#709L, sum(items#616L)#711L, sum(items_value#618)#712, sum(freight_value#619)#713, sum(order_value#620)#714, avg(order_value#620)#715, avg(review_score#628)#716, avg(delivery_days#625)#717, avg(cast(is_late#627 as int))#718, count(customer_unique_id#609)#710L]
+Results [12]: [purchase_year#634, purchase_month#635, count(1)#709L AS orders#699L, count(customer_unique_id#609)#710L AS customers#700L, sum(items#616L)#711L AS items#701L, sum(items_value#618)#712 AS revenue#702, sum(freight_value#619)#713 AS freight#703, sum(order_value#620)#714 AS gmv#704, round(avg(order_value#620)#715, 2) AS avg_order_value#705, round(avg(review_score#628)#716, 2) AS avg_review_score#706, round(avg(delivery_days#625)#717, 1) AS avg_delivery_days#707, round((100.0 * avg(cast(is_late#627 as int))#718), 2) AS late_delivery_pct#708]
+
+(10) Exchange
+Input [12]: [purchase_year#634, purchase_month#635, orders#699L, customers#700L, items#701L, revenue#702, freight#703, gmv#704, avg_order_value#705, avg_review_score#706, avg_delivery_days#707, late_delivery_pct#708]
+Arguments: rangepartitioning(purchase_year#634 ASC NULLS FIRST, purchase_month#635 ASC NULLS FIRST, 16), ENSURE_REQUIREMENTS, [plan_id=3504]
+
+(11) Sort
+Input [12]: [purchase_year#634, purchase_month#635, orders#699L, customers#700L, items#701L, revenue#702, freight#703, gmv#704, avg_order_value#705, avg_review_score#706, avg_delivery_days#707, late_delivery_pct#708]
+Arguments: [purchase_year#634 ASC NULLS FIRST, purchase_month#635 ASC NULLS FIRST], true, 0
+
+(12) AdaptiveSparkPlan
+Output [12]: [purchase_year#634, purchase_month#635, orders#699L, customers#700L, items#701L, revenue#702, freight#703, gmv#704, avg_order_value#705, avg_review_score#706, avg_delivery_days#707, late_delivery_pct#708]
+Arguments: isFinalPlan=false
+

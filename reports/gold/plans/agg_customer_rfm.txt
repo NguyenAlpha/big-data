@@ -1,0 +1,100 @@
+== Physical Plan ==
+AdaptiveSparkPlan (16)
++- SortAggregate (15)
+   +- Sort (14)
+      +- Exchange (13)
+         +- SortAggregate (12)
+            +- Sort (11)
+               +- BroadcastNestedLoopJoin Cross BuildRight (10)
+                  :- Project (3)
+                  :  +- Filter (2)
+                  :     +- Scan parquet  (1)
+                  +- BroadcastExchange (9)
+                     +- HashAggregate (8)
+                        +- Exchange (7)
+                           +- HashAggregate (6)
+                              +- Project (5)
+                                 +- Scan parquet  (4)
+
+
+(1) Scan parquet 
+Output [9]: [customer_unique_id#1948, is_valid_sale#1950, order_purchase_timestamp#1951, purchase_date#1952, customer_state#1953, order_value#1959, review_score#1967, purchase_year#1973, purchase_month#1974]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/gold/fact_orders]
+PushedFilters: [IsNotNull(is_valid_sale), EqualTo(is_valid_sale,true)]
+ReadSchema: struct<customer_unique_id:string,is_valid_sale:boolean,order_purchase_timestamp:timestamp,purchase_date:date,customer_state:string,order_value:decimal(23,2),review_score:int>
+
+(2) Filter
+Input [9]: [customer_unique_id#1948, is_valid_sale#1950, order_purchase_timestamp#1951, purchase_date#1952, customer_state#1953, order_value#1959, review_score#1967, purchase_year#1973, purchase_month#1974]
+Condition : (isnotnull(is_valid_sale#1950) AND is_valid_sale#1950)
+
+(3) Project
+Output [6]: [customer_unique_id#1948, order_purchase_timestamp#1951, purchase_date#1952, customer_state#1953, order_value#1959, review_score#1967]
+Input [9]: [customer_unique_id#1948, is_valid_sale#1950, order_purchase_timestamp#1951, purchase_date#1952, customer_state#1953, order_value#1959, review_score#1967, purchase_year#1973, purchase_month#1974]
+
+(4) Scan parquet 
+Output [3]: [purchase_date#613, purchase_year#634, purchase_month#635]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/gold/fact_orders]
+ReadSchema: struct<purchase_date:date>
+
+(5) Project
+Output [1]: [purchase_date#613]
+Input [3]: [purchase_date#613, purchase_year#634, purchase_month#635]
+
+(6) HashAggregate
+Input [1]: [purchase_date#613]
+Keys: []
+Functions [1]: [partial_max(purchase_date#613)]
+Aggregate Attributes [1]: [max#2018]
+Results [1]: [max#2019]
+
+(7) Exchange
+Input [1]: [max#2019]
+Arguments: SinglePartition, ENSURE_REQUIREMENTS, [plan_id=4734]
+
+(8) HashAggregate
+Input [1]: [max#2019]
+Keys: []
+Functions [1]: [max(purchase_date#613)]
+Aggregate Attributes [1]: [max(purchase_date#613)#1975]
+Results [1]: [max(purchase_date#613)#1975 AS ref_date#1945]
+
+(9) BroadcastExchange
+Input [1]: [ref_date#1945]
+Arguments: IdentityBroadcastMode, [plan_id=4737]
+
+(10) BroadcastNestedLoopJoin
+Join type: Cross
+Join condition: None
+
+(11) Sort
+Input [7]: [customer_unique_id#1948, order_purchase_timestamp#1951, purchase_date#1952, customer_state#1953, order_value#1959, review_score#1967, ref_date#1945]
+Arguments: [customer_unique_id#1948 ASC NULLS FIRST], false, 0
+
+(12) SortAggregate
+Input [7]: [customer_unique_id#1948, order_purchase_timestamp#1951, purchase_date#1952, customer_state#1953, order_value#1959, review_score#1967, ref_date#1945]
+Keys [1]: [customer_unique_id#1948]
+Functions [8]: [partial_max_by(customer_state#1953, order_purchase_timestamp#1951), partial_min(purchase_date#1952), partial_max(purchase_date#1952), partial_max(ref_date#1945), partial_count(1), partial_sum(order_value#1959), partial_avg(order_value#1959), partial_avg(review_score#1967)]
+Aggregate Attributes [12]: [valueWithExtremumOrdering#1994, extremumOrdering#1995, min#1996, max#1997, max#1998, count#1999L, sum#2000, isEmpty#2001, sum#2002, count#2003L, sum#2004, count#2005L]
+Results [13]: [customer_unique_id#1948, valueWithExtremumOrdering#2006, extremumOrdering#2007, min#2008, max#2009, max#2010, count#2011L, sum#2012, isEmpty#2013, sum#2014, count#2015L, sum#2016, count#2017L]
+
+(13) Exchange
+Input [13]: [customer_unique_id#1948, valueWithExtremumOrdering#2006, extremumOrdering#2007, min#2008, max#2009, max#2010, count#2011L, sum#2012, isEmpty#2013, sum#2014, count#2015L, sum#2016, count#2017L]
+Arguments: hashpartitioning(customer_unique_id#1948, 16), ENSURE_REQUIREMENTS, [plan_id=4743]
+
+(14) Sort
+Input [13]: [customer_unique_id#1948, valueWithExtremumOrdering#2006, extremumOrdering#2007, min#2008, max#2009, max#2010, count#2011L, sum#2012, isEmpty#2013, sum#2014, count#2015L, sum#2016, count#2017L]
+Arguments: [customer_unique_id#1948 ASC NULLS FIRST], false, 0
+
+(15) SortAggregate
+Input [13]: [customer_unique_id#1948, valueWithExtremumOrdering#2006, extremumOrdering#2007, min#2008, max#2009, max#2010, count#2011L, sum#2012, isEmpty#2013, sum#2014, count#2015L, sum#2016, count#2017L]
+Keys [1]: [customer_unique_id#1948]
+Functions [8]: [max_by(customer_state#1953, order_purchase_timestamp#1951), min(purchase_date#1952), max(purchase_date#1952), max(ref_date#1945), count(1), sum(order_value#1959), avg(order_value#1959), avg(review_score#1967)]
+Aggregate Attributes [8]: [max_by(customer_state#1953, order_purchase_timestamp#1951)#1977, min(purchase_date#1952)#1978, max(purchase_date#1952)#1979, max(ref_date#1945)#1980, count(1)#1976L, sum(order_value#1959)#1982, avg(order_value#1959)#1983, avg(review_score#1967)#1984]
+Results [9]: [customer_unique_id#1948, max_by(customer_state#1953, order_purchase_timestamp#1951)#1977 AS customer_state#1937, min(purchase_date#1952)#1978 AS first_purchase_date#1938, max(purchase_date#1952)#1979 AS last_purchase_date#1939, datediff(max(ref_date#1945)#1980, max(purchase_date#1952)#1979) AS recency_days#1940, count(1)#1976L AS frequency#1941L, sum(order_value#1959)#1982 AS monetary#1942, round(avg(order_value#1959)#1983, 2) AS avg_order_value#1943, round(avg(review_score#1967)#1984, 2) AS avg_review_score#1944]
+
+(16) AdaptiveSparkPlan
+Output [9]: [customer_unique_id#1948, customer_state#1937, first_purchase_date#1938, last_purchase_date#1939, recency_days#1940, frequency#1941L, monetary#1942, avg_order_value#1943, avg_review_score#1944]
+Arguments: isFinalPlan=false
+

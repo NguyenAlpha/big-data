@@ -1,0 +1,1295 @@
+{
+  "run": {
+    "started_at": "2026-10-28 03:13:23",
+    "spark_version": "3.5.3",
+    "master": "spark://spark-master:7077",
+    "executors": 2,
+    "default_parallelism": 4,
+    "silver_rows": 569698,
+    "silver_size_mb": 40.37,
+    "gold_size_mb": 33.3,
+    "build_seconds": 36.21,
+    "reconcile_seconds": 6.92,
+    "total_seconds": 60.11
+  },
+  "tables": {
+    "fact_order_items": {
+      "kind": "fact",
+      "grain": "1 sản phẩm trong 1 đơn hàng",
+      "rows": 112650,
+      "schema": [
+        [
+          "order_id",
+          "string"
+        ],
+        [
+          "order_item_id",
+          "int"
+        ],
+        [
+          "product_id",
+          "string"
+        ],
+        [
+          "seller_id",
+          "string"
+        ],
+        [
+          "customer_id",
+          "string"
+        ],
+        [
+          "customer_unique_id",
+          "string"
+        ],
+        [
+          "order_status",
+          "string"
+        ],
+        [
+          "is_valid_sale",
+          "boolean"
+        ],
+        [
+          "order_purchase_timestamp",
+          "timestamp"
+        ],
+        [
+          "purchase_date",
+          "date"
+        ],
+        [
+          "category",
+          "string"
+        ],
+        [
+          "price",
+          "decimal(12,2)"
+        ],
+        [
+          "freight_value",
+          "decimal(12,2)"
+        ],
+        [
+          "item_total",
+          "decimal(12,2)"
+        ],
+        [
+          "customer_state",
+          "string"
+        ],
+        [
+          "customer_city",
+          "string"
+        ],
+        [
+          "seller_state",
+          "string"
+        ],
+        [
+          "seller_city",
+          "string"
+        ],
+        [
+          "distance_km",
+          "double"
+        ],
+        [
+          "delivery_days",
+          "int"
+        ],
+        [
+          "delivery_delay_days",
+          "int"
+        ],
+        [
+          "is_late",
+          "boolean"
+        ],
+        [
+          "review_score",
+          "int"
+        ],
+        [
+          "main_payment_type",
+          "string"
+        ],
+        [
+          "max_installments",
+          "int"
+        ],
+        [
+          "purchase_year",
+          "int"
+        ],
+        [
+          "purchase_month",
+          "int"
+        ]
+      ],
+      "size_mb": 16.27,
+      "files": 24,
+      "joins": {
+        "BroadcastHashJoin": 6,
+        "SortMergeJoin": 0,
+        "BroadcastNestedLoopJoin": 0
+      },
+      "seconds": 12.92
+    },
+    "fact_orders": {
+      "kind": "fact",
+      "grain": "1 đơn hàng",
+      "rows": 99441,
+      "schema": [
+        [
+          "order_id",
+          "string"
+        ],
+        [
+          "customer_id",
+          "string"
+        ],
+        [
+          "customer_unique_id",
+          "string"
+        ],
+        [
+          "order_status",
+          "string"
+        ],
+        [
+          "is_valid_sale",
+          "boolean"
+        ],
+        [
+          "order_purchase_timestamp",
+          "timestamp"
+        ],
+        [
+          "purchase_date",
+          "date"
+        ],
+        [
+          "customer_state",
+          "string"
+        ],
+        [
+          "customer_city",
+          "string"
+        ],
+        [
+          "items",
+          "bigint"
+        ],
+        [
+          "sellers",
+          "bigint"
+        ],
+        [
+          "items_value",
+          "decimal(22,2)"
+        ],
+        [
+          "freight_value",
+          "decimal(22,2)"
+        ],
+        [
+          "order_value",
+          "decimal(23,2)"
+        ],
+        [
+          "payment_total",
+          "decimal(22,2)"
+        ],
+        [
+          "payment_count",
+          "bigint"
+        ],
+        [
+          "main_payment_type",
+          "string"
+        ],
+        [
+          "max_installments",
+          "int"
+        ],
+        [
+          "delivery_days",
+          "int"
+        ],
+        [
+          "delivery_delay_days",
+          "int"
+        ],
+        [
+          "is_late",
+          "boolean"
+        ],
+        [
+          "review_score",
+          "int"
+        ],
+        [
+          "review_has_comment",
+          "boolean"
+        ],
+        [
+          "dq_delivered_without_date",
+          "boolean"
+        ],
+        [
+          "dq_carrier_before_purchase",
+          "boolean"
+        ],
+        [
+          "dq_no_items",
+          "boolean"
+        ],
+        [
+          "dq_no_payment",
+          "boolean"
+        ],
+        [
+          "purchase_year",
+          "int"
+        ],
+        [
+          "purchase_month",
+          "int"
+        ]
+      ],
+      "size_mb": 12.66,
+      "files": 25,
+      "joins": {
+        "BroadcastHashJoin": 4,
+        "SortMergeJoin": 0,
+        "BroadcastNestedLoopJoin": 0
+      },
+      "seconds": 9.68
+    },
+    "agg_sales_monthly": {
+      "kind": "agg",
+      "grain": "1 tháng",
+      "rows": 24,
+      "schema": [
+        [
+          "purchase_year",
+          "int"
+        ],
+        [
+          "purchase_month",
+          "int"
+        ],
+        [
+          "orders",
+          "bigint"
+        ],
+        [
+          "customers",
+          "bigint"
+        ],
+        [
+          "items",
+          "bigint"
+        ],
+        [
+          "revenue",
+          "decimal(32,2)"
+        ],
+        [
+          "freight",
+          "decimal(32,2)"
+        ],
+        [
+          "gmv",
+          "decimal(33,2)"
+        ],
+        [
+          "avg_order_value",
+          "decimal(24,2)"
+        ],
+        [
+          "avg_review_score",
+          "double"
+        ],
+        [
+          "avg_delivery_days",
+          "double"
+        ],
+        [
+          "late_delivery_pct",
+          "double"
+        ]
+      ],
+      "size_mb": 0.0,
+      "files": 1,
+      "joins": {
+        "BroadcastHashJoin": 0,
+        "SortMergeJoin": 0,
+        "BroadcastNestedLoopJoin": 0
+      },
+      "seconds": 2.79
+    },
+    "agg_category_monthly": {
+      "kind": "agg",
+      "grain": "1 danh mục x 1 tháng",
+      "rows": 1282,
+      "schema": [
+        [
+          "purchase_year",
+          "int"
+        ],
+        [
+          "purchase_month",
+          "int"
+        ],
+        [
+          "category",
+          "string"
+        ],
+        [
+          "orders",
+          "bigint"
+        ],
+        [
+          "items",
+          "bigint"
+        ],
+        [
+          "revenue",
+          "decimal(22,2)"
+        ],
+        [
+          "freight",
+          "decimal(22,2)"
+        ],
+        [
+          "avg_price",
+          "decimal(13,2)"
+        ],
+        [
+          "avg_review_score",
+          "double"
+        ]
+      ],
+      "size_mb": 0.03,
+      "files": 1,
+      "joins": {
+        "BroadcastHashJoin": 0,
+        "SortMergeJoin": 0,
+        "BroadcastNestedLoopJoin": 0
+      },
+      "seconds": 2.0
+    },
+    "agg_customer_state": {
+      "kind": "agg",
+      "grain": "1 bang của khách hàng",
+      "rows": 27,
+      "schema": [
+        [
+          "customer_state",
+          "string"
+        ],
+        [
+          "orders",
+          "bigint"
+        ],
+        [
+          "customers",
+          "bigint"
+        ],
+        [
+          "revenue",
+          "decimal(32,2)"
+        ],
+        [
+          "gmv",
+          "decimal(33,2)"
+        ],
+        [
+          "avg_order_value",
+          "decimal(24,2)"
+        ],
+        [
+          "avg_freight",
+          "decimal(23,2)"
+        ],
+        [
+          "freight_pct_of_revenue",
+          "decimal(35,2)"
+        ],
+        [
+          "avg_delivery_days",
+          "double"
+        ],
+        [
+          "late_delivery_pct",
+          "double"
+        ],
+        [
+          "avg_review_score",
+          "double"
+        ]
+      ],
+      "size_mb": 0.0,
+      "files": 1,
+      "joins": {
+        "BroadcastHashJoin": 0,
+        "SortMergeJoin": 0,
+        "BroadcastNestedLoopJoin": 0
+      },
+      "seconds": 1.99
+    },
+    "agg_seller_performance": {
+      "kind": "agg",
+      "grain": "1 người bán",
+      "rows": 3053,
+      "schema": [
+        [
+          "seller_id",
+          "string"
+        ],
+        [
+          "seller_state",
+          "string"
+        ],
+        [
+          "seller_city",
+          "string"
+        ],
+        [
+          "orders",
+          "bigint"
+        ],
+        [
+          "items",
+          "bigint"
+        ],
+        [
+          "customers",
+          "bigint"
+        ],
+        [
+          "revenue",
+          "decimal(22,2)"
+        ],
+        [
+          "avg_price",
+          "decimal(13,2)"
+        ],
+        [
+          "avg_review_score",
+          "double"
+        ],
+        [
+          "avg_delivery_days",
+          "double"
+        ],
+        [
+          "late_delivery_pct",
+          "double"
+        ],
+        [
+          "avg_distance_km",
+          "double"
+        ],
+        [
+          "first_sale_date",
+          "date"
+        ],
+        [
+          "last_sale_date",
+          "date"
+        ],
+        [
+          "active_months",
+          "bigint"
+        ]
+      ],
+      "size_mb": 0.19,
+      "files": 1,
+      "joins": {
+        "BroadcastHashJoin": 0,
+        "SortMergeJoin": 0,
+        "BroadcastNestedLoopJoin": 0
+      },
+      "seconds": 3.57
+    },
+    "agg_customer_rfm": {
+      "kind": "agg",
+      "grain": "1 khách hàng thật",
+      "rows": 94983,
+      "schema": [
+        [
+          "customer_unique_id",
+          "string"
+        ],
+        [
+          "customer_state",
+          "string"
+        ],
+        [
+          "first_purchase_date",
+          "date"
+        ],
+        [
+          "last_purchase_date",
+          "date"
+        ],
+        [
+          "recency_days",
+          "int"
+        ],
+        [
+          "frequency",
+          "bigint"
+        ],
+        [
+          "monetary",
+          "decimal(33,2)"
+        ],
+        [
+          "avg_order_value",
+          "decimal(24,2)"
+        ],
+        [
+          "avg_review_score",
+          "double"
+        ]
+      ],
+      "size_mb": 4.15,
+      "files": 1,
+      "joins": {
+        "BroadcastHashJoin": 0,
+        "SortMergeJoin": 0,
+        "BroadcastNestedLoopJoin": 1
+      },
+      "seconds": 2.5
+    }
+  },
+  "reconciliation": [
+    {
+      "check": "fact_order_items giữ nguyên số dòng của silver order_items (join không mất/nhân dòng)",
+      "left_sql": "SELECT COUNT(*) FROM fact_order_items",
+      "right_sql": "SELECT COUNT(*) FROM order_items",
+      "left": 112650,
+      "right": 112650,
+      "ok": true
+    },
+    {
+      "check": "Tổng giá sản phẩm không đổi sau khi join",
+      "left_sql": "SELECT SUM(price) FROM fact_order_items",
+      "right_sql": "SELECT SUM(price) FROM order_items",
+      "left": "13591643.70",
+      "right": "13591643.70",
+      "ok": true
+    },
+    {
+      "check": "fact_orders giữ nguyên số đơn của silver orders",
+      "left_sql": "SELECT COUNT(*) FROM fact_orders",
+      "right_sql": "SELECT COUNT(*) FROM orders",
+      "left": 99441,
+      "right": 99441,
+      "ok": true
+    },
+    {
+      "check": "fact_orders: tổng giá trị hàng khớp silver order_items",
+      "left_sql": "SELECT SUM(items_value) FROM fact_orders",
+      "right_sql": "SELECT SUM(price) FROM order_items",
+      "left": "13591643.70",
+      "right": "13591643.70",
+      "ok": true
+    },
+    {
+      "check": "Hai bảng fact thống nhất về doanh thu đơn hợp lệ",
+      "left_sql": "SELECT SUM(items_value) FROM fact_orders WHERE is_valid_sale",
+      "right_sql": "SELECT SUM(price) FROM fact_order_items WHERE is_valid_sale",
+      "left": "13494400.74",
+      "right": "13494400.74",
+      "ok": true
+    },
+    {
+      "check": "Doanh thu các tháng cộng lại = doanh thu đơn hợp lệ",
+      "left_sql": "SELECT SUM(revenue) FROM agg_sales_monthly",
+      "right_sql": "SELECT SUM(items_value) FROM fact_orders WHERE is_valid_sale",
+      "left": "13494400.74",
+      "right": "13494400.74",
+      "ok": true
+    },
+    {
+      "check": "Doanh thu các danh mục cộng lại = doanh thu theo tháng",
+      "left_sql": "SELECT SUM(revenue) FROM agg_category_monthly",
+      "right_sql": "SELECT SUM(revenue) FROM agg_sales_monthly",
+      "left": "13494400.74",
+      "right": "13494400.74",
+      "ok": true
+    },
+    {
+      "check": "Doanh thu các bang cộng lại = doanh thu theo tháng",
+      "left_sql": "SELECT SUM(revenue) FROM agg_customer_state",
+      "right_sql": "SELECT SUM(revenue) FROM agg_sales_monthly",
+      "left": "13494400.74",
+      "right": "13494400.74",
+      "ok": true
+    },
+    {
+      "check": "Doanh thu các người bán cộng lại = doanh thu theo tháng",
+      "left_sql": "SELECT SUM(revenue) FROM agg_seller_performance",
+      "right_sql": "SELECT SUM(revenue) FROM agg_sales_monthly",
+      "left": "13494400.74",
+      "right": "13494400.74",
+      "ok": true
+    },
+    {
+      "check": "Số đơn trong RFM = số đơn theo tháng",
+      "left_sql": "SELECT SUM(frequency) FROM agg_customer_rfm",
+      "right_sql": "SELECT SUM(orders) FROM agg_sales_monthly",
+      "left": 98199,
+      "right": 98199,
+      "ok": true
+    },
+    {
+      "check": "Số khách trong RFM = số khách thật có đơn hợp lệ",
+      "left_sql": "SELECT COUNT(*) FROM agg_customer_rfm",
+      "right_sql": "SELECT COUNT(DISTINCT customer_unique_id) FROM fact_orders WHERE is_valid_sale",
+      "left": 94983,
+      "right": 94983,
+      "ok": true
+    }
+  ],
+  "previews": {
+    "Doanh thu theo tháng": [
+      {
+        "year": 2016,
+        "month": 9,
+        "orders": 2,
+        "customers": 2,
+        "revenue": "207.86",
+        "gmv": "279.69",
+        "avg_order_value": "139.85",
+        "avg_review_score": 1.0,
+        "avg_delivery_days": 55.0,
+        "late_delivery_pct": 100.0
+      },
+      {
+        "year": 2016,
+        "month": 10,
+        "orders": 290,
+        "customers": 287,
+        "revenue": "44507.30",
+        "gmv": "51354.52",
+        "avg_order_value": "177.08",
+        "avg_review_score": 3.82,
+        "avg_delivery_days": 19.6,
+        "late_delivery_pct": 1.13
+      },
+      {
+        "year": 2016,
+        "month": 12,
+        "orders": 1,
+        "customers": 1,
+        "revenue": "10.90",
+        "gmv": "19.62",
+        "avg_order_value": "19.62",
+        "avg_review_score": 5.0,
+        "avg_delivery_days": 5.0,
+        "late_delivery_pct": 0.0
+      },
+      {
+        "year": 2017,
+        "month": 1,
+        "orders": 787,
+        "customers": 753,
+        "revenue": "120098.27",
+        "gmv": "136943.46",
+        "avg_order_value": "174.01",
+        "avg_review_score": 4.09,
+        "avg_delivery_days": 12.8,
+        "late_delivery_pct": 3.07
+      },
+      {
+        "year": 2017,
+        "month": 2,
+        "orders": 1718,
+        "customers": 1693,
+        "revenue": "244959.35",
+        "gmv": "283561.69",
+        "avg_order_value": "165.05",
+        "avg_review_score": 4.1,
+        "avg_delivery_days": 13.3,
+        "late_delivery_pct": 3.21
+      },
+      {
+        "year": 2017,
+        "month": 3,
+        "orders": 2617,
+        "customers": 2577,
+        "revenue": "368341.32",
+        "gmv": "425617.96",
+        "avg_order_value": "162.64",
+        "avg_review_score": 4.13,
+        "avg_delivery_days": 13.0,
+        "late_delivery_pct": 5.58
+      },
+      {
+        "year": 2017,
+        "month": 4,
+        "orders": 2377,
+        "customers": 2345,
+        "revenue": "353842.98",
+        "gmv": "405848.61",
+        "avg_order_value": "170.74",
+        "avg_review_score": 4.07,
+        "avg_delivery_days": 15.0,
+        "late_delivery_pct": 7.86
+      },
+      {
+        "year": 2017,
+        "month": 5,
+        "orders": 3640,
+        "customers": 3569,
+        "revenue": "503159.19",
+        "gmv": "582710.83",
+        "avg_order_value": "160.09",
+        "avg_review_score": 4.18,
+        "avg_delivery_days": 11.4,
+        "late_delivery_pct": 3.61
+      },
+      {
+        "year": 2017,
+        "month": 6,
+        "orders": 3205,
+        "customers": 3142,
+        "revenue": "429916.61",
+        "gmv": "499652.24",
+        "avg_order_value": "155.90",
+        "avg_review_score": 4.18,
+        "avg_delivery_days": 12.0,
+        "late_delivery_pct": 3.86
+      },
+      {
+        "year": 2017,
+        "month": 7,
+        "orders": 3946,
+        "customers": 3872,
+        "revenue": "492287.30",
+        "gmv": "578753.73",
+        "avg_order_value": "146.67",
+        "avg_review_score": 4.23,
+        "avg_delivery_days": 11.5,
+        "late_delivery_pct": 3.43
+      },
+      {
+        "year": 2017,
+        "month": 8,
+        "orders": 4272,
+        "customers": 4191,
+        "revenue": "568245.79",
+        "gmv": "661903.52",
+        "avg_order_value": "154.94",
+        "avg_review_score": 4.27,
+        "avg_delivery_days": 11.0,
+        "late_delivery_pct": 3.32
+      },
+      {
+        "year": 2017,
+        "month": 9,
+        "orders": 4227,
+        "customers": 4154,
+        "revenue": "621415.91",
+        "gmv": "717102.72",
+        "avg_order_value": "169.65",
+        "avg_review_score": 4.22,
+        "avg_delivery_days": 11.7,
+        "late_delivery_pct": 5.2
+      },
+      {
+        "year": 2017,
+        "month": 10,
+        "orders": 4547,
+        "customers": 4481,
+        "revenue": "660179.62",
+        "gmv": "764756.03",
+        "avg_order_value": "168.19",
+        "avg_review_score": 4.17,
+        "avg_delivery_days": 11.7,
+        "late_delivery_pct": 5.29
+      },
+      {
+        "year": 2017,
+        "month": 11,
+        "orders": 7421,
+        "customers": 7313,
+        "revenue": "1003862.14",
+        "gmv": "1172191.68",
+        "avg_order_value": "157.96",
+        "avg_review_score": 3.95,
+        "avg_delivery_days": 15.1,
+        "late_delivery_pct": 14.31
+      },
+      {
+        "year": 2017,
+        "month": 12,
+        "orders": 5618,
+        "customers": 5551,
+        "revenue": "742183.79",
+        "gmv": "861526.77",
+        "avg_order_value": "153.35",
+        "avg_review_score": 4.04,
+        "avg_delivery_days": 15.3,
+        "late_delivery_pct": 8.38
+      },
+      {
+        "year": 2018,
+        "month": 1,
+        "orders": 7187,
+        "customers": 7088,
+        "revenue": "945456.29",
+        "gmv": "1101920.01",
+        "avg_order_value": "153.32",
+        "avg_review_score": 4.07,
+        "avg_delivery_days": 14.0,
+        "late_delivery_pct": 6.56
+      },
+      {
+        "year": 2018,
+        "month": 2,
+        "orders": 6624,
+        "customers": 6468,
+        "revenue": "837895.43",
+        "gmv": "979486.16",
+        "avg_order_value": "147.87",
+        "avg_review_score": 3.86,
+        "avg_delivery_days": 16.9,
+        "late_delivery_pct": 15.99
+      },
+      {
+        "year": 2018,
+        "month": 3,
+        "orders": 7168,
+        "customers": 7077,
+        "revenue": "981051.06",
+        "gmv": "1152656.99",
+        "avg_order_value": "160.81",
+        "avg_review_score": 3.76,
+        "avg_delivery_days": 16.2,
+        "late_delivery_pct": 21.36
+      },
+      {
+        "year": 2018,
+        "month": 4,
+        "orders": 6919,
+        "customers": 6863,
+        "revenue": "993592.98",
+        "gmv": "1156248.89",
+        "avg_order_value": "167.11",
+        "avg_review_score": 4.17,
+        "avg_delivery_days": 11.4,
+        "late_delivery_pct": 5.31
+      },
+      {
+        "year": 2018,
+        "month": 5,
+        "orders": 6833,
+        "customers": 6775,
+        "revenue": "992871.75",
+        "gmv": "1145686.46",
+        "avg_order_value": "167.67",
+        "avg_review_score": 4.21,
+        "avg_delivery_days": 11.3,
+        "late_delivery_pct": 8.24
+      },
+      {
+        "year": 2018,
+        "month": 6,
+        "orders": 6145,
+        "customers": 6106,
+        "revenue": "863265.53",
+        "gmv": "1020381.90",
+        "avg_order_value": "166.05",
+        "avg_review_score": 4.29,
+        "avg_delivery_days": 9.2,
+        "late_delivery_pct": 1.36
+      },
+      {
+        "year": 2018,
+        "month": 7,
+        "orders": 6233,
+        "customers": 6172,
+        "revenue": "878044.27",
+        "gmv": "1039783.58",
+        "avg_order_value": "166.82",
+        "avg_review_score": 4.29,
+        "avg_delivery_days": 8.9,
+        "late_delivery_pct": 4.48
+      },
+      {
+        "year": 2018,
+        "month": 8,
+        "orders": 6421,
+        "customers": 6380,
+        "revenue": "848860.10",
+        "gmv": "996973.51",
+        "avg_order_value": "155.27",
+        "avg_review_score": 4.29,
+        "avg_delivery_days": 7.7,
+        "late_delivery_pct": 10.39
+      },
+      {
+        "year": 2018,
+        "month": 9,
+        "orders": 1,
+        "customers": 1,
+        "revenue": "145.00",
+        "gmv": "166.46",
+        "avg_order_value": "166.46",
+        "avg_review_score": 1.0,
+        "avg_delivery_days": null,
+        "late_delivery_pct": null
+      }
+    ],
+    "Top 10 danh mục theo doanh thu (cả giai đoạn)": [
+      {
+        "category": "health_beauty",
+        "orders": 8800,
+        "items": 9634,
+        "revenue": "1255695.13",
+        "avg_price": "130.34"
+      },
+      {
+        "category": "watches_gifts",
+        "orders": 5604,
+        "items": 5970,
+        "revenue": "1198185.21",
+        "avg_price": "200.70"
+      },
+      {
+        "category": "bed_bath_table",
+        "orders": 9399,
+        "items": 11097,
+        "revenue": "1035964.06",
+        "avg_price": "93.36"
+      },
+      {
+        "category": "sports_leisure",
+        "orders": 7673,
+        "items": 8590,
+        "revenue": "979740.92",
+        "avg_price": "114.06"
+      },
+      {
+        "category": "computers_accessories",
+        "orders": 6654,
+        "items": 7781,
+        "revenue": "904322.02",
+        "avg_price": "116.22"
+      },
+      {
+        "category": "furniture_decor",
+        "orders": 6425,
+        "items": 8298,
+        "revenue": "727465.05",
+        "avg_price": "87.67"
+      },
+      {
+        "category": "housewares",
+        "orders": 5847,
+        "items": 6915,
+        "revenue": "626825.80",
+        "avg_price": "90.65"
+      },
+      {
+        "category": "cool_stuff",
+        "orders": 3616,
+        "items": 3779,
+        "revenue": "620770.49",
+        "avg_price": "164.27"
+      },
+      {
+        "category": "auto",
+        "orders": 3872,
+        "items": 4204,
+        "revenue": "586585.73",
+        "avg_price": "139.53"
+      },
+      {
+        "category": "garden_tools",
+        "orders": 3505,
+        "items": 4328,
+        "revenue": "481009.94",
+        "avg_price": "111.14"
+      }
+    ],
+    "Top 10 bang theo doanh thu": [
+      {
+        "customer_state": "SP",
+        "orders": 41125,
+        "customers": 39747,
+        "revenue": "5163867.22",
+        "avg_order_value": "142.93",
+        "freight_pct_of_revenue": "13.83",
+        "avg_delivery_days": 8.7,
+        "late_delivery_pct": 5.89,
+        "avg_review_score": 4.21
+      },
+      {
+        "customer_state": "RJ",
+        "orders": 12697,
+        "customers": 12241,
+        "revenue": "1811623.42",
+        "avg_order_value": "166.63",
+        "freight_pct_of_revenue": "16.78",
+        "avg_delivery_days": 15.2,
+        "late_delivery_pct": 13.47,
+        "avg_review_score": 3.91
+      },
+      {
+        "customer_state": "MG",
+        "orders": 11496,
+        "customers": 11134,
+        "revenue": "1573508.20",
+        "avg_order_value": "160.32",
+        "freight_pct_of_revenue": "17.13",
+        "avg_delivery_days": 11.9,
+        "late_delivery_pct": 5.61,
+        "avg_review_score": 4.16
+      },
+      {
+        "customer_state": "RS",
+        "orders": 5415,
+        "customers": 5233,
+        "revenue": "742559.78",
+        "avg_order_value": "162.01",
+        "freight_pct_of_revenue": "18.14",
+        "avg_delivery_days": 15.2,
+        "late_delivery_pct": 7.15,
+        "avg_review_score": 4.15
+      },
+      {
+        "customer_state": "PR",
+        "orders": 4982,
+        "customers": 4824,
+        "revenue": "676883.06",
+        "avg_order_value": "159.41",
+        "freight_pct_of_revenue": "17.33",
+        "avg_delivery_days": 11.9,
+        "late_delivery_pct": 5.0,
+        "avg_review_score": 4.21
+      },
+      {
+        "customer_state": "SC",
+        "orders": 3599,
+        "customers": 3501,
+        "revenue": "518578.28",
+        "avg_order_value": "168.94",
+        "freight_pct_of_revenue": "17.25",
+        "avg_delivery_days": 14.9,
+        "late_delivery_pct": 9.76,
+        "avg_review_score": 4.1
+      },
+      {
+        "customer_state": "BA",
+        "orders": 3344,
+        "customers": 3244,
+        "revenue": "507108.83",
+        "avg_order_value": "181.49",
+        "freight_pct_of_revenue": "19.68",
+        "avg_delivery_days": 19.3,
+        "late_delivery_pct": 14.04,
+        "avg_review_score": 3.88
+      },
+      {
+        "customer_state": "DF",
+        "orders": 2120,
+        "customers": 2057,
+        "revenue": "300886.45",
+        "avg_order_value": "165.72",
+        "freight_pct_of_revenue": "16.76",
+        "avg_delivery_days": 12.9,
+        "late_delivery_pct": 7.07,
+        "avg_review_score": 4.09
+      },
+      {
+        "customer_state": "GO",
+        "orders": 1998,
+        "customers": 1934,
+        "revenue": "287870.46",
+        "avg_order_value": "170.44",
+        "freight_pct_of_revenue": "18.30",
+        "avg_delivery_days": 15.5,
+        "late_delivery_pct": 8.18,
+        "avg_review_score": 4.07
+      },
+      {
+        "customer_state": "ES",
+        "orders": 2018,
+        "customers": 1950,
+        "revenue": "273532.13",
+        "avg_order_value": "160.10",
+        "freight_pct_of_revenue": "18.11",
+        "avg_delivery_days": 15.7,
+        "late_delivery_pct": 12.23,
+        "avg_review_score": 4.05
+      }
+    ],
+    "Top 10 người bán theo doanh thu": [
+      {
+        "seller_id": "4869f7a5dfa277a7dca6462dcf3b52b2",
+        "seller_state": "SP",
+        "orders": 1131,
+        "revenue": "229237.63",
+        "avg_review_score": 4.13,
+        "avg_delivery_days": 14.9,
+        "late_delivery_pct": 11.59,
+        "avg_distance_km": 610.0,
+        "active_months": 17
+      },
+      {
+        "seller_id": "53243585a1d6dc2643021fd1853d8905",
+        "seller_state": "BA",
+        "orders": 358,
+        "revenue": "222776.05",
+        "avg_review_score": 4.08,
+        "avg_delivery_days": 13.3,
+        "late_delivery_pct": 4.0,
+        "avg_distance_km": 1195.3,
+        "active_months": 12
+      },
+      {
+        "seller_id": "4a3ca9315b744ce9f8e9374361493884",
+        "seller_state": "SP",
+        "orders": 1804,
+        "revenue": "200326.12",
+        "avg_review_score": 3.8,
+        "avg_delivery_days": 14.4,
+        "late_delivery_pct": 10.98,
+        "avg_distance_km": 563.6,
+        "active_months": 20
+      },
+      {
+        "seller_id": "fa1c13f2614d7b5c4749cbc52fecda94",
+        "seller_state": "SP",
+        "orders": 584,
+        "revenue": "192842.13",
+        "avg_review_score": 4.34,
+        "avg_delivery_days": 13.3,
+        "late_delivery_pct": 10.19,
+        "avg_distance_km": 684.4,
+        "active_months": 20
+      },
+      {
+        "seller_id": "7c67e1448b00f6e969d365cea6b010ab",
+        "seller_state": "SP",
+        "orders": 982,
+        "revenue": "187923.89",
+        "avg_review_score": 3.35,
+        "avg_delivery_days": 22.3,
+        "late_delivery_pct": 9.59,
+        "avg_distance_km": 545.9,
+        "active_months": 20
+      },
+      {
+        "seller_id": "7e93a43ef30c4f03f38b393420bc753a",
+        "seller_state": "SP",
+        "orders": 332,
+        "revenue": "172583.88",
+        "avg_review_score": 4.24,
+        "avg_delivery_days": 11.3,
+        "late_delivery_pct": 5.59,
+        "avg_distance_km": 664.1,
+        "active_months": 20
+      },
+      {
+        "seller_id": "da8622b14eb17ae2831f4ac5b9dab84a",
+        "seller_state": "SP",
+        "orders": 1314,
+        "revenue": "160236.57",
+        "avg_review_score": 4.07,
+        "avg_delivery_days": 11.1,
+        "late_delivery_pct": 7.3,
+        "avg_distance_km": 401.7,
+        "active_months": 19
+      },
+      {
+        "seller_id": "7a67c85e85bb2ce8582c35f2203ad736",
+        "seller_state": "SP",
+        "orders": 1159,
+        "revenue": "141715.54",
+        "avg_review_score": 4.24,
+        "avg_delivery_days": 11.1,
+        "late_delivery_pct": 5.89,
+        "avg_distance_km": 622.1,
+        "active_months": 20
+      },
+      {
+        "seller_id": "1025f0e2d44d7041d6cf58b6550e0bfa",
+        "seller_state": "SP",
+        "orders": 915,
+        "revenue": "138968.55",
+        "avg_review_score": 3.85,
+        "avg_delivery_days": 12.0,
+        "late_delivery_pct": 9.23,
+        "avg_distance_km": 573.7,
+        "active_months": 14
+      },
+      {
+        "seller_id": "955fee9216a65b617aa5c0531780ce60",
+        "seller_state": "SP",
+        "orders": 1286,
+        "revenue": "135159.70",
+        "avg_review_score": 4.05,
+        "avg_delivery_days": 10.7,
+        "late_delivery_pct": 8.08,
+        "avg_distance_km": 493.5,
+        "active_months": 14
+      }
+    ],
+    "Phân bố số đơn mỗi khách (Frequency trong RFM)": [
+      {
+        "orders_per_customer": 1,
+        "customers": 92096,
+        "pct": 96.96
+      },
+      {
+        "orders_per_customer": 2,
+        "customers": 2651,
+        "pct": 2.79
+      },
+      {
+        "orders_per_customer": 3,
+        "customers": 188,
+        "pct": 0.2
+      },
+      {
+        "orders_per_customer": 4,
+        "customers": 29,
+        "pct": 0.03
+      },
+      {
+        "orders_per_customer": 5,
+        "customers": 9,
+        "pct": 0.01
+      },
+      {
+        "orders_per_customer": 6,
+        "customers": 5,
+        "pct": 0.01
+      },
+      {
+        "orders_per_customer": 7,
+        "customers": 3,
+        "pct": 0.0
+      },
+      {
+        "orders_per_customer": 9,
+        "customers": 1,
+        "pct": 0.0
+      },
+      {
+        "orders_per_customer": 16,
+        "customers": 1,
+        "pct": 0.0
+      }
+    ]
+  }
+}

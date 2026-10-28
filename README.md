@@ -17,7 +17,7 @@ bằng **Apache Spark (PySpark)** chạy trên cụm Spark Standalone dựng b�
 | 2 | Dựng cụm Spark bằng Docker (1 master + 2 worker) | Xong | [docs/01-moi-truong-spark.md](docs/01-moi-truong-spark.md) |
 | 3 | Data profiling: khảo sát chất lượng dữ liệu **trước** xử lý | Xong | [docs/02-data-profiling.md](docs/02-data-profiling.md) |
 | 4 | Làm sạch và chuẩn hoá, lưu Parquet (silver) | Xong | [docs/03-lam-sach-du-lieu.md](docs/03-lam-sach-du-lieu.md) |
-| 5 | Kết hợp và tổng hợp bằng Spark SQL (gold) | Chưa làm | |
+| 5 | Kết hợp và tổng hợp bằng Spark SQL (gold) | Xong | [docs/04-ket-hop-tong-hop.md](docs/04-ket-hop-tong-hop.md) |
 | 6 | Thực nghiệm: chất lượng sau xử lý, thời gian, mở rộng quy mô | Chưa làm | |
 
 ## Cấu trúc thư mục
@@ -27,15 +27,19 @@ bằng **Apache Spark (PySpark)** chạy trên cụm Spark Standalone dựng b�
 ├── docker-compose.yml        # Cụm Spark: spark-master, spark-worker-1, spark-worker-2
 ├── dataset/                  # CSV gốc của Olist (KHÔNG có trên git, xem bên dưới)
 ├── data/                     # Dữ liệu sinh ra bởi job, không có trên git
-│   └── silver/               # Bước 4: 8 bảng Parquet đã làm sạch
+│   ├── silver/               # Bước 4: 8 bảng Parquet đã làm sạch
+│   └── gold/                 # Bước 5: 2 bảng fact + 5 bảng tổng hợp (KPI)
 ├── jobs/
 │   ├── olist_tables.py       # "Data contract": mô tả bảng, khoá, kiểu, luật kiểm tra
 │   ├── common.py             # Hàm dùng chung: đọc CSV, chuẩn hoá chữ, log, đo thời gian
 │   ├── 01_profiling.py       # Bước 3: job profiling
-│   └── 02_clean.py           # Bước 4: job làm sạch raw CSV -> silver Parquet
+│   ├── 02_clean.py           # Bước 4: job làm sạch raw CSV -> silver Parquet
+│   ├── 03_gold.py            # Bước 5: chạy các file SQL, ghi gold, đối chiếu số liệu
+│   └── sql/                  # Bước 5: logic join/tổng hợp viết bằng Spark SQL
 ├── reports/
 │   ├── profiling/            # Kết quả bước 3 (báo cáo .md, số liệu .json, log)
-│   └── cleaning/             # Kết quả bước 4 (báo cáo trước/sau, số liệu .json, log)
+│   ├── cleaning/             # Kết quả bước 4 (báo cáo trước/sau, số liệu .json, log)
+│   └── gold/                 # Kết quả bước 5 (báo cáo, đối chiếu, execution plan)
 └── docs/                     # Tài liệu giải thích từng bước
 ```
 
@@ -100,7 +104,23 @@ Job chạy khoảng 70 giây (không phụ thuộc bước 3, chạy riêng đư
 | `reports/cleaning/cleaning_summary.json` | Cùng số liệu dạng JSON |
 | `reports/cleaning/cleaning_run.log` | Log thời gian từng bảng |
 
-### 5. Tắt cụm
+### 5. Chạy job tổng hợp (bước 5)
+Cần chạy bước 4 trước (job đọc dữ liệu từ `data/silver/`).
+```bash
+docker compose exec spark-master /opt/spark/bin/spark-submit     --master spark://spark-master:7077 /opt/jobs/03_gold.py
+```
+Job chạy khoảng 60 giây. Kết quả:
+
+| Đầu ra | Nội dung |
+|---|---|
+| `data/gold/fact_order_items/`, `data/gold/fact_orders/` | Bảng chi tiết đã join sẵn (chia thư mục theo năm/tháng) |
+| `data/gold/agg_*/` | 5 bảng KPI: theo tháng, danh mục, bang, người bán, khách hàng (RFM) |
+| `reports/gold/gold_report.md` | Số dòng, 11 kiểm tra đối chiếu số liệu, xem trước KPI, schema |
+| `reports/gold/plans/*.txt` | Kế hoạch thực thi của Spark (loại join được chọn) |
+
+Nếu một kiểm tra đối chiếu bị sai, job kết thúc với lỗi `Đối chiếu số liệu SAI: ...`.
+
+### 6. Tắt cụm
 ```bash
 docker compose down
 ```

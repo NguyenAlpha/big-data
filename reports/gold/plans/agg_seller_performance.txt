@@ -1,0 +1,98 @@
+== Physical Plan ==
+AdaptiveSparkPlan (16)
++- Sort (15)
+   +- Exchange (14)
+      +- SortAggregate (13)
+         +- Sort (12)
+            +- Exchange (11)
+               +- SortAggregate (10)
+                  +- SortAggregate (9)
+                     +- Sort (8)
+                        +- Exchange (7)
+                           +- SortAggregate (6)
+                              +- Sort (5)
+                                 +- Expand (4)
+                                    +- Project (3)
+                                       +- Filter (2)
+                                          +- Scan parquet  (1)
+
+
+(1) Scan parquet 
+Output [14]: [order_id#367, seller_id#370, customer_unique_id#372, is_valid_sale#374, purchase_date#376, price#378, seller_state#383, seller_city#384, distance_km#385, delivery_days#386, is_late#388, review_score#389, purchase_year#392, purchase_month#393]
+Batched: true
+Location: InMemoryFileIndex [file:/data/lake/gold/fact_order_items]
+PushedFilters: [IsNotNull(is_valid_sale), EqualTo(is_valid_sale,true)]
+ReadSchema: struct<order_id:string,seller_id:string,customer_unique_id:string,is_valid_sale:boolean,purchase_date:date,price:decimal(12,2),seller_state:string,seller_city:string,distance_km:double,delivery_days:int,is_late:boolean,review_score:int>
+
+(2) Filter
+Input [14]: [order_id#367, seller_id#370, customer_unique_id#372, is_valid_sale#374, purchase_date#376, price#378, seller_state#383, seller_city#384, distance_km#385, delivery_days#386, is_late#388, review_score#389, purchase_year#392, purchase_month#393]
+Condition : (isnotnull(is_valid_sale#374) AND is_valid_sale#374)
+
+(3) Project
+Output [13]: [order_id#367, seller_id#370, customer_unique_id#372, purchase_date#376, price#378, seller_state#383, seller_city#384, distance_km#385, delivery_days#386, is_late#388, review_score#389, purchase_year#392, purchase_month#393]
+Input [14]: [order_id#367, seller_id#370, customer_unique_id#372, is_valid_sale#374, purchase_date#376, price#378, seller_state#383, seller_city#384, distance_km#385, delivery_days#386, is_late#388, review_score#389, purchase_year#392, purchase_month#393]
+
+(4) Expand
+Input [13]: [order_id#367, seller_id#370, customer_unique_id#372, purchase_date#376, price#378, seller_state#383, seller_city#384, distance_km#385, delivery_days#386, is_late#388, review_score#389, purchase_year#392, purchase_month#393]
+Arguments: [[seller_id#370, null, null, null, 0, seller_state#383, seller_city#384, price#378, review_score#389, delivery_days#386, cast(is_late#388 as int), distance_km#385, purchase_date#376], [seller_id#370, order_id#367, null, null, 1, null, null, null, null, null, null, null, null], [seller_id#370, null, customer_unique_id#372, null, 2, null, null, null, null, null, null, null, null], [seller_id#370, null, null, ((purchase_year#392 * 100) + purchase_month#393), 3, null, null, null, null, null, null, null, null]], [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, fact_order_items.seller_state#1403, fact_order_items.seller_city#1404, fact_order_items.price#1405, fact_order_items.review_score#1406, fact_order_items.delivery_days#1407, CAST(fact_order_items.is_late AS INT)#1408, fact_order_items.distance_km#1409, fact_order_items.purchase_date#1410]
+
+(5) Sort
+Input [13]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, fact_order_items.seller_state#1403, fact_order_items.seller_city#1404, fact_order_items.price#1405, fact_order_items.review_score#1406, fact_order_items.delivery_days#1407, CAST(fact_order_items.is_late AS INT)#1408, fact_order_items.distance_km#1409, fact_order_items.purchase_date#1410]
+Arguments: [seller_id#370 ASC NULLS FIRST, fact_order_items.order_id#1400 ASC NULLS FIRST, fact_order_items.customer_unique_id#1401 ASC NULLS FIRST, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402 ASC NULLS FIRST, gid#1399 ASC NULLS FIRST], false, 0
+
+(6) SortAggregate
+Input [13]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, fact_order_items.seller_state#1403, fact_order_items.seller_city#1404, fact_order_items.price#1405, fact_order_items.review_score#1406, fact_order_items.delivery_days#1407, CAST(fact_order_items.is_late AS INT)#1408, fact_order_items.distance_km#1409, fact_order_items.purchase_date#1410]
+Keys [5]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399]
+Functions [11]: [partial_max(fact_order_items.seller_state#1403), partial_max(fact_order_items.seller_city#1404), partial_count(1), partial_sum(fact_order_items.price#1405), partial_avg(fact_order_items.price#1405), partial_avg(fact_order_items.review_score#1406), partial_avg(fact_order_items.delivery_days#1407), partial_avg(CAST(fact_order_items.is_late AS INT)#1408), partial_avg(fact_order_items.distance_km#1409), partial_min(fact_order_items.purchase_date#1410), partial_max(fact_order_items.purchase_date#1410)]
+Aggregate Attributes [17]: [max#1483, max#1484, count#1485L, sum#1486, isEmpty#1487, sum#1488, count#1489L, sum#1490, count#1491L, sum#1492, count#1493L, sum#1494, count#1495L, sum#1496, count#1497L, min#1498, max#1499]
+Results [22]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, max#1500, max#1501, count#1502L, sum#1503, isEmpty#1504, sum#1505, count#1506L, sum#1507, count#1508L, sum#1509, count#1510L, sum#1511, count#1512L, sum#1513, count#1514L, min#1515, max#1516]
+
+(7) Exchange
+Input [22]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, max#1500, max#1501, count#1502L, sum#1503, isEmpty#1504, sum#1505, count#1506L, sum#1507, count#1508L, sum#1509, count#1510L, sum#1511, count#1512L, sum#1513, count#1514L, min#1515, max#1516]
+Arguments: hashpartitioning(seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, 16), ENSURE_REQUIREMENTS, [plan_id=4381]
+
+(8) Sort
+Input [22]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, max#1500, max#1501, count#1502L, sum#1503, isEmpty#1504, sum#1505, count#1506L, sum#1507, count#1508L, sum#1509, count#1510L, sum#1511, count#1512L, sum#1513, count#1514L, min#1515, max#1516]
+Arguments: [seller_id#370 ASC NULLS FIRST, fact_order_items.order_id#1400 ASC NULLS FIRST, fact_order_items.customer_unique_id#1401 ASC NULLS FIRST, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402 ASC NULLS FIRST, gid#1399 ASC NULLS FIRST], false, 0
+
+(9) SortAggregate
+Input [22]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, max#1500, max#1501, count#1502L, sum#1503, isEmpty#1504, sum#1505, count#1506L, sum#1507, count#1508L, sum#1509, count#1510L, sum#1511, count#1512L, sum#1513, count#1514L, min#1515, max#1516]
+Keys [5]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399]
+Functions [11]: [max(fact_order_items.seller_state#1403), max(fact_order_items.seller_city#1404), count(1), sum(fact_order_items.price#1405), avg(fact_order_items.price#1405), avg(fact_order_items.review_score#1406), avg(fact_order_items.delivery_days#1407), avg(CAST(fact_order_items.is_late AS INT)#1408), avg(fact_order_items.distance_km#1409), min(fact_order_items.purchase_date#1410), max(fact_order_items.purchase_date#1410)]
+Aggregate Attributes [11]: [max(fact_order_items.seller_state#1403)#1370, max(fact_order_items.seller_city#1404)#1371, count(1)#1373L, sum(fact_order_items.price#1405)#1375, avg(fact_order_items.price#1405)#1376, avg(fact_order_items.review_score#1406)#1377, avg(fact_order_items.delivery_days#1407)#1378, avg(CAST(fact_order_items.is_late AS INT)#1408)#1379, avg(fact_order_items.distance_km#1409)#1380, min(fact_order_items.purchase_date#1410)#1381, max(fact_order_items.purchase_date#1410)#1382]
+Results [16]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, max(fact_order_items.seller_state#1403)#1370 AS max(fact_order_items.seller_state)#1411, max(fact_order_items.seller_city#1404)#1371 AS max(fact_order_items.seller_city)#1413, count(1)#1373L AS count(1)#1415L, sum(fact_order_items.price#1405)#1375 AS sum(fact_order_items.price)#1417, avg(fact_order_items.price#1405)#1376 AS avg(fact_order_items.price)#1419, avg(fact_order_items.review_score#1406)#1377 AS avg(fact_order_items.review_score)#1421, avg(fact_order_items.delivery_days#1407)#1378 AS avg(fact_order_items.delivery_days)#1423, avg(CAST(fact_order_items.is_late AS INT)#1408)#1379 AS avg(CAST(fact_order_items.is_late AS INT))#1425, avg(fact_order_items.distance_km#1409)#1380 AS avg(fact_order_items.distance_km)#1427, min(fact_order_items.purchase_date#1410)#1381 AS min(fact_order_items.purchase_date)#1429, max(fact_order_items.purchase_date#1410)#1382 AS max(fact_order_items.purchase_date)#1431]
+
+(10) SortAggregate
+Input [16]: [seller_id#370, fact_order_items.order_id#1400, fact_order_items.customer_unique_id#1401, ((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402, gid#1399, max(fact_order_items.seller_state)#1411, max(fact_order_items.seller_city)#1413, count(1)#1415L, sum(fact_order_items.price)#1417, avg(fact_order_items.price)#1419, avg(fact_order_items.review_score)#1421, avg(fact_order_items.delivery_days)#1423, avg(CAST(fact_order_items.is_late AS INT))#1425, avg(fact_order_items.distance_km)#1427, min(fact_order_items.purchase_date)#1429, max(fact_order_items.purchase_date)#1431]
+Keys [1]: [seller_id#370]
+Functions [14]: [partial_first(max(fact_order_items.seller_state)#1411, true) FILTER (WHERE (gid#1399 = 0)), partial_first(max(fact_order_items.seller_city)#1413, true) FILTER (WHERE (gid#1399 = 0)), partial_count(fact_order_items.order_id#1400) FILTER (WHERE (gid#1399 = 1)), partial_first(count(1)#1415L, true) FILTER (WHERE (gid#1399 = 0)), partial_count(fact_order_items.customer_unique_id#1401) FILTER (WHERE (gid#1399 = 2)), partial_first(sum(fact_order_items.price)#1417, true) FILTER (WHERE (gid#1399 = 0)), partial_first(avg(fact_order_items.price)#1419, true) FILTER (WHERE (gid#1399 = 0)), partial_first(avg(fact_order_items.review_score)#1421, true) FILTER (WHERE (gid#1399 = 0)), partial_first(avg(fact_order_items.delivery_days)#1423, true) FILTER (WHERE (gid#1399 = 0)), partial_first(avg(CAST(fact_order_items.is_late AS INT))#1425, true) FILTER (WHERE (gid#1399 = 0)), partial_first(avg(fact_order_items.distance_km)#1427, true) FILTER (WHERE (gid#1399 = 0)), partial_first(min(fact_order_items.purchase_date)#1429, true) FILTER (WHERE (gid#1399 = 0)), partial_first(max(fact_order_items.purchase_date)#1431, true) FILTER (WHERE (gid#1399 = 0)), partial_count(((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402) FILTER (WHERE (gid#1399 = 3))]
+Aggregate Attributes [25]: [first#1433, valueSet#1434, first#1435, valueSet#1436, count#1437L, first#1438L, valueSet#1439, count#1440L, first#1441, valueSet#1442, first#1443, valueSet#1444, first#1445, valueSet#1446, first#1447, valueSet#1448, first#1449, valueSet#1450, first#1451, valueSet#1452, first#1453, valueSet#1454, first#1455, valueSet#1456, count#1457L]
+Results [26]: [seller_id#370, first#1458, valueSet#1459, first#1460, valueSet#1461, count#1462L, first#1463L, valueSet#1464, count#1465L, first#1466, valueSet#1467, first#1468, valueSet#1469, first#1470, valueSet#1471, first#1472, valueSet#1473, first#1474, valueSet#1475, first#1476, valueSet#1477, first#1478, valueSet#1479, first#1480, valueSet#1481, count#1482L]
+
+(11) Exchange
+Input [26]: [seller_id#370, first#1458, valueSet#1459, first#1460, valueSet#1461, count#1462L, first#1463L, valueSet#1464, count#1465L, first#1466, valueSet#1467, first#1468, valueSet#1469, first#1470, valueSet#1471, first#1472, valueSet#1473, first#1474, valueSet#1475, first#1476, valueSet#1477, first#1478, valueSet#1479, first#1480, valueSet#1481, count#1482L]
+Arguments: hashpartitioning(seller_id#370, 16), ENSURE_REQUIREMENTS, [plan_id=4386]
+
+(12) Sort
+Input [26]: [seller_id#370, first#1458, valueSet#1459, first#1460, valueSet#1461, count#1462L, first#1463L, valueSet#1464, count#1465L, first#1466, valueSet#1467, first#1468, valueSet#1469, first#1470, valueSet#1471, first#1472, valueSet#1473, first#1474, valueSet#1475, first#1476, valueSet#1477, first#1478, valueSet#1479, first#1480, valueSet#1481, count#1482L]
+Arguments: [seller_id#370 ASC NULLS FIRST], false, 0
+
+(13) SortAggregate
+Input [26]: [seller_id#370, first#1458, valueSet#1459, first#1460, valueSet#1461, count#1462L, first#1463L, valueSet#1464, count#1465L, first#1466, valueSet#1467, first#1468, valueSet#1469, first#1470, valueSet#1471, first#1472, valueSet#1473, first#1474, valueSet#1475, first#1476, valueSet#1477, first#1478, valueSet#1479, first#1480, valueSet#1481, count#1482L]
+Keys [1]: [seller_id#370]
+Functions [14]: [first(max(fact_order_items.seller_state)#1411, true), first(max(fact_order_items.seller_city)#1413, true), count(fact_order_items.order_id#1400), first(count(1)#1415L, true), count(fact_order_items.customer_unique_id#1401), first(sum(fact_order_items.price)#1417, true), first(avg(fact_order_items.price)#1419, true), first(avg(fact_order_items.review_score)#1421, true), first(avg(fact_order_items.delivery_days)#1423, true), first(avg(CAST(fact_order_items.is_late AS INT))#1425, true), first(avg(fact_order_items.distance_km)#1427, true), first(min(fact_order_items.purchase_date)#1429, true), first(max(fact_order_items.purchase_date)#1431, true), count(((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402)]
+Aggregate Attributes [14]: [first(max(fact_order_items.seller_state)#1411) ignore nulls#1412, first(max(fact_order_items.seller_city)#1413) ignore nulls#1414, count(fact_order_items.order_id#1400)#1372L, first(count(1)#1415L) ignore nulls#1416L, count(fact_order_items.customer_unique_id#1401)#1374L, first(sum(fact_order_items.price)#1417) ignore nulls#1418, first(avg(fact_order_items.price)#1419) ignore nulls#1420, first(avg(fact_order_items.review_score)#1421) ignore nulls#1422, first(avg(fact_order_items.delivery_days)#1423) ignore nulls#1424, first(avg(CAST(fact_order_items.is_late AS INT))#1425) ignore nulls#1426, first(avg(fact_order_items.distance_km)#1427) ignore nulls#1428, first(min(fact_order_items.purchase_date)#1429) ignore nulls#1430, first(max(fact_order_items.purchase_date)#1431) ignore nulls#1432, count(((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402)#1383L]
+Results [15]: [seller_id#370, first(max(fact_order_items.seller_state)#1411) ignore nulls#1412 AS seller_state#1356, first(max(fact_order_items.seller_city)#1413) ignore nulls#1414 AS seller_city#1357, count(fact_order_items.order_id#1400)#1372L AS orders#1358L, coalesce(first(count(1)#1415L) ignore nulls#1416L, 0) AS items#1359L, count(fact_order_items.customer_unique_id#1401)#1374L AS customers#1360L, first(sum(fact_order_items.price)#1417) ignore nulls#1418 AS revenue#1361, round(first(avg(fact_order_items.price)#1419) ignore nulls#1420, 2) AS avg_price#1362, round(first(avg(fact_order_items.review_score)#1421) ignore nulls#1422, 2) AS avg_review_score#1363, round(first(avg(fact_order_items.delivery_days)#1423) ignore nulls#1424, 1) AS avg_delivery_days#1364, round((100.0 * first(avg(CAST(fact_order_items.is_late AS INT))#1425) ignore nulls#1426), 2) AS late_delivery_pct#1365, round(first(avg(fact_order_items.distance_km)#1427) ignore nulls#1428, 1) AS avg_distance_km#1366, first(min(fact_order_items.purchase_date)#1429) ignore nulls#1430 AS first_sale_date#1367, first(max(fact_order_items.purchase_date)#1431) ignore nulls#1432 AS last_sale_date#1368, count(((fact_order_items.purchase_year * 100) + fact_order_items.purchase_month)#1402)#1383L AS active_months#1369L]
+
+(14) Exchange
+Input [15]: [seller_id#370, seller_state#1356, seller_city#1357, orders#1358L, items#1359L, customers#1360L, revenue#1361, avg_price#1362, avg_review_score#1363, avg_delivery_days#1364, late_delivery_pct#1365, avg_distance_km#1366, first_sale_date#1367, last_sale_date#1368, active_months#1369L]
+Arguments: rangepartitioning(revenue#1361 DESC NULLS LAST, 16), ENSURE_REQUIREMENTS, [plan_id=4390]
+
+(15) Sort
+Input [15]: [seller_id#370, seller_state#1356, seller_city#1357, orders#1358L, items#1359L, customers#1360L, revenue#1361, avg_price#1362, avg_review_score#1363, avg_delivery_days#1364, late_delivery_pct#1365, avg_distance_km#1366, first_sale_date#1367, last_sale_date#1368, active_months#1369L]
+Arguments: [revenue#1361 DESC NULLS LAST], true, 0
+
+(16) AdaptiveSparkPlan
+Output [15]: [seller_id#370, seller_state#1356, seller_city#1357, orders#1358L, items#1359L, customers#1360L, revenue#1361, avg_price#1362, avg_review_score#1363, avg_delivery_days#1364, late_delivery_pct#1365, avg_distance_km#1366, first_sale_date#1367, last_sale_date#1368, active_months#1369L]
+Arguments: isFinalPlan=false
+

@@ -1,0 +1,20 @@
+2026-10-28 03:13:29 | INFO | Spark 3.5.3 | master=spark://spark-master:7077 | executors=2 | parallelism=4
+2026-10-28 03:13:55 | INFO | fact_order_items           112,650 dòng | 24 file | broadcast=6 sortmerge=0 | 12.92s
+2026-10-28 03:14:05 | INFO | fact_orders                 99,441 dòng | 25 file | broadcast=4 sortmerge=0 | 9.68s
+2026-10-28 03:14:07 | INFO | agg_sales_monthly               24 dòng |  1 file | broadcast=0 sortmerge=0 | 2.79s
+2026-10-28 03:14:03 | INFO | agg_category_monthly         1,282 dòng |  1 file | broadcast=0 sortmerge=0 | 2.00s
+2026-10-28 03:14:14 | INFO | agg_customer_state              27 dòng |  1 file | broadcast=0 sortmerge=0 | 1.99s
+2026-10-28 03:14:18 | INFO | agg_seller_performance       3,053 dòng |  1 file | broadcast=0 sortmerge=0 | 3.57s
+2026-10-28 03:14:20 | INFO | agg_customer_rfm            94,983 dòng |  1 file | broadcast=0 sortmerge=0 | 2.50s
+2026-10-28 03:14:21 | INFO | Đối chiếu OK   fact_order_items giữ nguyên số dòng của silver order_items (join không mất/nhân dòng)
+2026-10-28 03:14:22 | INFO | Đối chiếu OK   Tổng giá sản phẩm không đổi sau khi join
+2026-10-28 03:14:23 | INFO | Đối chiếu OK   fact_orders giữ nguyên số đơn của silver orders
+2026-10-28 03:14:23 | INFO | Đối chiếu OK   fact_orders: tổng giá trị hàng khớp silver order_items
+2026-10-28 03:14:24 | INFO | Đối chiếu OK   Hai bảng fact thống nhất về doanh thu đơn hợp lệ
+2026-10-28 03:14:25 | INFO | Đối chiếu OK   Doanh thu các tháng cộng lại = doanh thu đơn hợp lệ
+2026-10-28 03:14:25 | INFO | Đối chiếu OK   Doanh thu các danh mục cộng lại = doanh thu theo tháng
+2026-10-28 03:14:26 | INFO | Đối chiếu OK   Doanh thu các bang cộng lại = doanh thu theo tháng
+2026-10-28 03:14:26 | INFO | Đối chiếu OK   Doanh thu các người bán cộng lại = doanh thu theo tháng
+2026-10-28 03:14:26 | INFO | Đối chiếu OK   Số đơn trong RFM = số đơn theo tháng
+2026-10-28 03:14:27 | INFO | Đối chiếu OK   Số khách trong RFM = số khách thật có đơn hợp lệ
+2026-10-28 03:14:28 | INFO | Xong sau 60.11s. Đối chiếu: 11/11 đạt. Báo cáo: reports/gold/gold_report.md
