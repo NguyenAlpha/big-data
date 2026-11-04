@@ -22,7 +22,7 @@ SURFACE = "#fcfcfb"
 TEXT = "#0b0b0b"
 TEXT_2 = "#52514e"
 GRID = "#e6e5e1"
-CLEAN = "#2a78d6"   # series 1 - làm sạch
+SILVER = "#2a78d6"  # series 1 - tầng silver (làm sạch)
 GOLD = "#eb6834"    # series 2 - tổng hợp gold
 IDEAL = "#9a9893"   # đường tham chiếu (lý tưởng)
 
@@ -47,19 +47,26 @@ def load():
     return rows
 
 
-def stacked_time(ax, labels, clean, gold, title, legend_loc="upper left"):
-    """Cột chồng: thời gian làm sạch + gold, ghi tổng trên đầu cột."""
-    x = range(len(labels))
-    # Viền màu nền 2px tạo khe hở giữa 2 đoạn cột
-    ax.bar(x, clean, width=0.55, color=CLEAN, edgecolor=SURFACE, linewidth=2,
-           label="Làm sạch (02_clean)")
-    ax.bar(x, gold, width=0.55, bottom=clean, color=GOLD, edgecolor=SURFACE, linewidth=2,
-           label="Tổng hợp gold (03_gold)")
-    for i, (c, g) in enumerate(zip(clean, gold)):
-        ax.text(i, c + g, "{:.0f}s".format(c + g), ha="center", va="bottom",
+def grouped_time(ax, labels, silver, gold, title, legend_loc="upper left"):
+    """
+    Cột đặt cạnh nhau: thời gian tầng silver (02_clean) và tầng gold (03_gold) cho
+    từng cấu hình, mỗi cột ghi số giây riêng. Tổng được ghi dưới nhãn trục x.
+    """
+    w = 0.36
+    xs = list(range(len(labels)))
+    # Viền màu nền 2px tạo khe hở giữa 2 cột cạnh nhau
+    ax.bar([x - w / 2 for x in xs], silver, width=w, color=SILVER, edgecolor=SURFACE,
+           linewidth=2, label="Silver: làm sạch (02_clean)")
+    ax.bar([x + w / 2 for x in xs], gold, width=w, color=GOLD, edgecolor=SURFACE,
+           linewidth=2, label="Gold: tổng hợp (03_gold)")
+    for x, sv, g in zip(xs, silver, gold):
+        ax.text(x - w / 2, sv, "{:.0f}s".format(sv), ha="center", va="bottom",
                 color=TEXT, fontsize=9, fontweight="bold")
-    ax.set_xticks(list(x))
-    ax.set_xticklabels(labels)
+        ax.text(x + w / 2, g, "{:.0f}s".format(g), ha="center", va="bottom",
+                color=TEXT, fontsize=9, fontweight="bold")
+    ax.set_xticks(xs)
+    ax.set_xticklabels(["{}\nTổng {:.0f}s".format(lb, sv + g)
+                        for lb, sv, g in zip(labels, silver, gold)])
     ax.set_ylabel("Thời gian xử lý (giây)")
     ax.set_title(title)
     # Đặt chú thích ở góc trống (không đè lên cột cao nhất)
@@ -74,13 +81,13 @@ def plot_e1(rows):
         return None
     labels = ["x{}\n{:,.0f} MB".format(s["scale"], s["raw_mb"]) for s in e1]
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.2))
-    stacked_time(a1, labels, [s["clean_s"] for s in e1], [s["gold_build_s"] for s in e1],
+    grouped_time(a1, labels, [s["clean_s"] for s in e1], [s["gold_build_s"] for s in e1],
                  "Thời gian xử lý theo quy mô dữ liệu")
 
     # Thông lượng: số dòng xử lý mỗi giây (1 series -> không cần chú thích)
     x = range(len(e1))
     thr = [s["rows_per_s"] / 1000 for s in e1]
-    a2.bar(x, thr, width=0.55, color=CLEAN)
+    a2.bar(x, thr, width=0.55, color=SILVER)
     for i, v in enumerate(thr):
         a2.text(i, v, "{:.1f}k".format(v), ha="center", va="bottom", color=TEXT, fontsize=9)
     a2.set_xticks(list(x))
@@ -104,7 +111,7 @@ def plot_e2(rows):
     if len(e2) < 2:
         return None
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.2))
-    stacked_time(a1, [s["cores_config"].replace(" (", "\n(") for s in e2],
+    grouped_time(a1, [s["cores_config"].replace(" (", "\n(") for s in e2],
                  [s["clean_s"] for s in e2], [s["gold_build_s"] for s in e2],
                  "Thời gian xử lý theo số core (dữ liệu x{})".format(E2_FACTOR),
                  legend_loc="upper right")
@@ -113,7 +120,7 @@ def plot_e2(rows):
     base = e2[0]["processing_s"] * e2[0]["total_cores"]
     speedup = [base / s["processing_s"] for s in e2]
     a2.plot(cores, cores, color=IDEAL, linewidth=1.5, linestyle="--", label="Lý tưởng (tuyến tính)")
-    a2.plot(cores, speedup, color=CLEAN, linewidth=2, marker="o", markersize=8,
+    a2.plot(cores, speedup, color=SILVER, linewidth=2, marker="o", markersize=8,
             markeredgecolor=SURFACE, markeredgewidth=2, label="Thực tế")
     for c, s in zip(cores, speedup):
         a2.annotate("{:.2f}x".format(s), (c, s), textcoords="offset points", xytext=(0, -16),

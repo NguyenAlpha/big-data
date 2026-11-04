@@ -2,11 +2,11 @@
 
 > Sinh tự động bởi `experiments/run_experiments.py` từ `results.csv` (12 lần chạy). Giải thích: `docs/05-thuc-nghiem.md`.
 
-*Thời gian xử lý* = làm sạch + tạo gold, **không** gồm khởi động Spark và các bước kiểm tra lại / đối chiếu. Mỗi cấu hình chạy nhiều lần, bảng ghi giá trị trung bình.
+*Tổng xử lý* = silver (02_clean) + gold (03_gold), **không** gồm khởi động Spark và các bước kiểm tra lại / đối chiếu. Mỗi cấu hình chạy nhiều lần, bảng ghi giá trị trung bình.
 
 ## E1 - Quy mô dữ liệu (4 core, 2 worker)
 
-| Quy mô | CSV vào (MB) | Số dòng vào | Làm sạch (s) | Gold (s) | Xử lý (s) | Min-max (s) | Dữ liệu tăng | Thời gian tăng | Dòng/giây | MB/giây | Broadcast join | Sort-merge join | Đối chiếu | Doanh thu hợp lệ |
+| Quy mô | CSV vào (MB) | Số dòng vào | Silver: 02_clean (s) | Gold: 03_gold (s) | Tổng xử lý (s) | Min-max (s) | Dữ liệu tăng | Thời gian tăng | Dòng/giây | MB/giây | Broadcast join | Sort-merge join | Đối chiếu | Doanh thu hợp lệ |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|
 | x1 | 120 | 1,550,922 | 51.0 | 39.8 | **90.8** | 88-94 | 1.0x | 1.0x | 17,095 | 1.33 | 10 | 0 | 11/11 | 13494400.74 |
 | x5 | 596 | 7,754,326 | 106.4 | 55.7 | **162.1** | 162-162 | 5.0x | 1.8x | 47,838 | 3.68 | 5 | 5 | 11/11 | 67472003.70 |
@@ -15,7 +15,7 @@
 
 ## E2 - Số core / worker (dữ liệu x5)
 
-| Cấu hình | Số lần chạy | Làm sạch (s) | Gold (s) | Xử lý (s) | Min-max (s) | Speedup so với 1 core | Hiệu suất (speedup / số core) | Dòng/giây |
+| Cấu hình | Số lần chạy | Silver: 02_clean (s) | Gold: 03_gold (s) | Tổng xử lý (s) | Min-max (s) | Speedup so với 1 core | Hiệu suất (speedup / số core) | Dòng/giây |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | 1 core | 2 | 175.9 | 100.7 | **276.6** | 274-279 | 1.00x | 100% | 28,040 |
 | 2 core (1 worker) | 2 | 132.9 | 66.4 | **199.3** | 198-201 | 1.39x | 69% | 38,909 |

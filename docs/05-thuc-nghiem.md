@@ -61,8 +61,15 @@ Giới hạn số core bằng tham số của `spark-submit`, không phải tắ
 | 2 core (1 worker) | `--total-executor-cores 2 --executor-cores 2` | 1 executor chiếm trọn 1 worker |
 | 4 core (2 worker) | `--total-executor-cores 4 --executor-cores 2` | Cụm đầy đủ |
 
-**Thời gian xử lý** = thời gian làm sạch (bước 4) + thời gian tạo gold (bước 5). Con số này
-**không** gồm khởi động Spark và các bước kiểm tra lại / đối chiếu số liệu.
+Mỗi lần chạy đo **riêng từng tầng**:
+
+| Đại lượng | Đo cái gì |
+|---|---|
+| **Silver** | Job `02_clean.py`: đọc CSV, làm sạch, ghi 8 bảng Parquet silver |
+| **Gold** | Job `03_gold.py`: đọc silver, join, tổng hợp, ghi 7 bảng gold |
+| **Tổng xử lý** | Silver + Gold |
+| **Kiểm tra** | Đọc lại silver để kiểm tra khoá chính, và chạy 11 kiểm tra đối chiếu của gold. **Không** tính vào tổng xử lý; ghi riêng ở mục 3.1. |
+| **Toàn bộ lệnh** | Thời gian từ lúc gõ `spark-submit` tới lúc kết thúc, gồm cả khởi động Spark, kiểm tra và ghi báo cáo (mục 3.1) |
 
 ### 2.4. Môi trường đo
 
@@ -75,14 +82,42 @@ Docker trên cùng máy này.
 
 ![Kết quả E1](../reports/experiments/fig_e1_scale.png)
 
-| Quy mô | CSV vào | Thời gian xử lý | Dữ liệu tăng | Thời gian tăng | Thông lượng | Join sort-merge / tổng | Đối chiếu | Doanh thu hợp lệ |
-|---|---:|---:|---:|---:|---:|---:|---|---:|
-| x1 | 120 MB | **90,8 s** | 1x | 1,0x | 17,1 nghìn dòng/s | 0 / 10 | 11/11 | 13.494.400,74 |
-| x5 | 596 MB | **162,1 s** | 5x | 1,8x | 47,8 nghìn dòng/s | 5 / 10 | 11/11 | 67.472.003,70 |
-| x10 | 1,2 GB | **241,6 s** | 10x | 2,7x | 64,2 nghìn dòng/s | 8 / 10 | 11/11 | 134.944.007,40 |
-| x20 | 2,4 GB | **399,0 s** | 20x | 4,4x | 77,8 nghìn dòng/s | 8 / 10 | 11/11 | 269.888.014,80 |
+**Thời gian từng tầng** (giây, trung bình 2 lần chạy):
+
+| Quy mô | CSV vào | Silver (02_clean) | Gold (03_gold) | **Tổng xử lý** | Silver tăng so với x1 | Gold tăng so với x1 | Tổng tăng so với x1 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| x1 | 120 MB | 51,0 | 39,8 | **90,8** | 1,0x | 1,0x | 1,0x |
+| x5 | 596 MB | 106,4 | 55,7 | **162,1** | 2,1x | 1,4x | 1,8x |
+| x10 | 1,2 GB | 163,7 | 77,9 | **241,6** | 3,2x | 2,0x | 2,7x |
+| x20 | 2,4 GB | 276,4 | 122,7 | **399,0** | 5,4x | 3,1x | 4,4x |
+
+**Thông lượng, cách join và độ đúng:**
+
+| Quy mô | Dữ liệu tăng | Thông lượng | Join sort-merge / tổng | Đối chiếu | Doanh thu hợp lệ |
+|---|---:|---:|---:|---|---:|
+| x1 | 1x | 17,1 nghìn dòng/s | 0 / 10 | 11/11 | 13.494.400,74 |
+| x5 | 5x | 47,8 nghìn dòng/s | 5 / 10 | 11/11 | 67.472.003,70 |
+| x10 | 10x | 64,2 nghìn dòng/s | 8 / 10 | 11/11 | 134.944.007,40 |
+| x20 | 20x | 77,8 nghìn dòng/s | 8 / 10 | 11/11 | 269.888.014,80 |
 
 Mỗi cấu hình chạy 2 lần; 2 lần chênh nhau tối đa khoảng 7% (ở x1, nơi thời gian ngắn nên dao động lớn hơn), các quy mô khác dưới 5%.
+
+### 3.1. Thời gian kiểm tra và thời gian toàn bộ lệnh
+
+Để minh bạch, đây là các phần **không** tính vào "Tổng xử lý" ở trên (giây, trung bình):
+
+| Quy mô | Kiểm tra silver (đọc lại, khoá chính) | Đối chiếu gold (11 kiểm tra) | Toàn bộ lệnh `02_clean.py` | Toàn bộ lệnh `03_gold.py` |
+|---|---:|---:|---:|---:|
+| x1 | 10,6 | 7,7 | 83,9 | 72,9 |
+| x5 | 13,3 | 8,0 | 148,6 | 90,6 |
+| x10 | 14,9 | 8,4 | 213,5 | 115,7 |
+| x20 | 20,0 | 11,0 | 340,4 | 167,4 |
+
+"Toàn bộ lệnh" lớn hơn "xử lý + kiểm tra" khoảng 20-45 s mỗi job. Phần chênh gồm:
+- khởi động JVM, chờ worker cấp executor;
+- đếm lại số dòng đầu vào để ghi báo cáo (ở x20 phải quét lại 2,4 GB CSV, nên phần chênh của
+  `02_clean.py` lên tới khoảng 44 s);
+- ghi file báo cáo.
 
 ### Nhận xét
 
@@ -121,8 +156,17 @@ càng được "chia đều", và cụm được dùng hiệu quả hơn.
 Spark chọn cách join **cho từng bảng** dựa trên kích thước, không cần sửa code. Đây là lợi thế
 của việc viết logic bằng SQL/DataFrame và để bộ tối ưu (Catalyst + AQE) quyết định cách chạy.
 
-**5. Điểm nghẽn là bảng `geolocation`.** Ở x20, riêng việc làm sạch bảng này mất khoảng 167 s
-trên 271 s của bước làm sạch (61%), vì phải loại trùng 20 triệu dòng toạ độ.
+**5. Tầng silver tăng nhanh hơn tầng gold.** Từ x1 lên x20, silver tăng 5,4x (51 → 276 s)
+trong khi gold chỉ tăng 3,1x (40 → 123 s). Silver chiếm 56% thời gian ở x1 và 69% ở x20.
+Lý do:
+- Silver phải xử lý **dữ liệu thô**: đọc và parse CSV (chậm hơn Parquet nhiều), loại trùng,
+  ghi lại toàn bộ.
+- Gold đọc **Parquet đã sạch và nhỏ hơn**. Riêng bảng geolocation đã được gộp từ hàng triệu
+  dòng xuống khoảng 19 nghìn dòng ở silver, nên gold không phải gánh phần này.
+
+**6. Điểm nghẽn của silver là bảng `geolocation`.** Ở x20, riêng việc làm sạch bảng này mất
+khoảng 167 s trên 271 s của tầng silver (61%), vì phải loại trùng 20 triệu dòng toạ độ. Muốn
+pipeline nhanh hơn, đây là chỗ cần tối ưu đầu tiên.
 
 ---
 
@@ -130,11 +174,20 @@ trên 271 s của bước làm sạch (61%), vì phải loại trùng 20 triệu
 
 ![Kết quả E2](../reports/experiments/fig_e2_cores.png)
 
-| Cấu hình | Thời gian xử lý | Speedup | Hiệu suất (speedup / số core) |
-|---|---:|---:|---:|
-| 1 core | 276,6 s | 1,00x | 100% |
-| 2 core (1 worker) | 199,3 s | 1,39x | 69% |
-| 4 core (2 worker) | 162,1 s | 1,71x | 43% |
+**Thời gian từng tầng** (giây, trung bình 2 lần chạy):
+
+| Cấu hình | Silver (02_clean) | Gold (03_gold) | **Tổng xử lý** | Speedup silver | Speedup gold | **Speedup tổng** | Hiệu suất (speedup tổng / số core) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 1 core | 175,9 | 100,7 | **276,6** | 1,00x | 1,00x | **1,00x** | 100% |
+| 2 core (1 worker) | 132,9 | 66,4 | **199,3** | 1,32x | 1,52x | **1,39x** | 69% |
+| 4 core (2 worker) | 106,4 | 55,7 | **162,1** | 1,65x | 1,81x | **1,71x** | 43% |
+
+Tầng gold tăng tốc tốt hơn silver khi thêm core (1,81x so với 1,65x). Cách giải thích hợp lý
+(nhóm **chưa đo riêng** từng nguyên nhân):
+- gold chủ yếu là join/group by trên Parquet, chia nhỏ tốt;
+- silver có nhiều job nhỏ chạy nối tiếp (đếm số dòng trước/sau từng thao tác để ghi báo cáo),
+  và các bảng nhỏ (`sellers`, bảng dịch danh mục) chỉ có rất ít partition nên không tận dụng
+  được thêm core.
 
 ### Nhận xét
 

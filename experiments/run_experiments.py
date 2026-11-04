@@ -234,14 +234,14 @@ def write_report():
     L = ["# Kết quả thực nghiệm - pipeline Processing (02_clean + 03_gold)\n",
          "> Sinh tự động bởi `experiments/run_experiments.py` từ `results.csv` "
          "({} lần chạy). Giải thích: `docs/05-thuc-nghiem.md`.\n".format(len(rows)),
-         "*Thời gian xử lý* = làm sạch + tạo gold, **không** gồm khởi động Spark và các bước "
+         "*Tổng xử lý* = silver (02_clean) + gold (03_gold), **không** gồm khởi động Spark và các bước "
          "kiểm tra lại / đối chiếu. Mỗi cấu hình chạy nhiều lần, bảng ghi giá trị trung bình.\n"]
 
     if e1:
         base = e1[0]
         L.append("## E1 - Quy mô dữ liệu (4 core, 2 worker)\n")
-        L.append("| Quy mô | CSV vào (MB) | Số dòng vào | Làm sạch (s) | Gold (s) | "
-                 "Xử lý (s) | Min-max (s) | Dữ liệu tăng | Thời gian tăng | Dòng/giây | MB/giây | "
+        L.append("| Quy mô | CSV vào (MB) | Số dòng vào | Silver: 02_clean (s) | Gold: 03_gold (s) | "
+                 "Tổng xử lý (s) | Min-max (s) | Dữ liệu tăng | Thời gian tăng | Dòng/giây | MB/giây | "
                  "Broadcast join | Sort-merge join | Đối chiếu | Doanh thu hợp lệ |")
         L.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|")
         for s in e1:
@@ -256,7 +256,7 @@ def write_report():
     if e2:
         one = e2[0]
         L.append("\n## E2 - Số core / worker (dữ liệu x{})\n".format(E2_FACTOR))
-        L.append("| Cấu hình | Số lần chạy | Làm sạch (s) | Gold (s) | Xử lý (s) | Min-max (s) | "
+        L.append("| Cấu hình | Số lần chạy | Silver: 02_clean (s) | Gold: 03_gold (s) | Tổng xử lý (s) | Min-max (s) | "
                  "Speedup so với 1 core | Hiệu suất (speedup / số core) | Dòng/giây |")
         L.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|")
         for s in e2:
